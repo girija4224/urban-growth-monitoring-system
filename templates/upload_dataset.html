@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'admin_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 800px; width: 100%;">
+            <h2>Data Collection & Preprocessing</h2>
+            <form action="{{ url_for('upload_dataset') }}" method="POST">
+                <div class="form-group">
+                    <label>Browse Train Folder Directory Path</label>
+                    <input type="text" placeholder="dataset/train/" required>
+                </div>
+                <div class="form-group">
+                    <label>Browse Test Folder Directory Path</label>
+                    <input type="text" placeholder="dataset/test/" required>
+                </div>
+                <button type="submit" class="btn">Simulate Data Collection</button>
+            </form>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem;">
+                <h4 style="color: #4facfe; margin-bottom: 1rem;">Dataset Statistics Simulation</h4>
+                <ul style="list-style: none; color: #cbd5e1; line-height: 2;">
+                    <li><strong>Training Images Count:</strong> 8000</li>
+                    <li><strong>Testing Images Count:</strong> 2000</li>
+                    <li><strong>Number of Classes:</strong> 2 (Urban, Non-Urban)</li>
+                    <li><strong>Dataset Size:</strong> ~1.2 GB</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

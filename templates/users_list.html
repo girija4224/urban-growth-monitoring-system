@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="width: 100%; text-align: right; margin-bottom: 1rem;">
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="width: auto; margin-right: 1rem;">Back to Dashboard</a>
+    <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="width: auto;">Logout</a>
+</div>
+<div class="card" style="max-width: 800px; width: 100%;">
+    <h2>Registered Users</h2>
+    
+    {% if users %}
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; color: #cbd5e1; margin-top: 2rem;">No users registered yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

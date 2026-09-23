@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body_class %}full-bg{% endblock %}
+{% block layout %}
+<div class="home-overlay">
+    <div style="text-align: center; max-width: 800px; padding: 2rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">AI/ML Based Urban Growth Monitoring</h1>
+        <p style="font-size: 1.2rem; color: #e2e8f0; margin-bottom: 3rem;">Urban Growth Detection using Remote Sensing Images and Deep Learning</p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('signup') }}" class="btn">User Sign Up</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">User Sign In</a>
+            <a href="{{ url_for('admin_login') }}" class="btn btn-secondary">Admin Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

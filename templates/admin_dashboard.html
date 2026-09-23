@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'admin_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
+            <h2>Admin Dashboard</h2>
+            <p style="color: var(--text-color); margin-bottom: 2rem;">Manage datasets, train models, and view users.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.5rem; text-align: center; border: 1px solid var(--primary);">
+                    <h1 style="color: var(--primary); font-size: 3rem; margin: 0;">{{ total_users }}</h1>
+                    <p>Total Registered Users</p>
+                </div>
+                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.5rem; text-align: center; border: 1px solid #10b981;">
+                    <h1 style="color: #10b981; font-size: 3rem; margin: 0;">{{ total_models }}</h1>
+                    <p>Total Models Run / Predictions</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <a href="{{ url_for('upload_dataset') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center;">Upload Dataset & Collect Data</a>
+                <a href="{{ url_for('train_model') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center;">Create & Train DL Models</a>
+                <a href="{{ url_for('user_details') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center; grid-column: span 2;">View Registered Users</a>
+            </div>
+            
+            <h4 style="margin-top: 3rem; color: var(--primary);">System Activity Feed</h4>
+            <div class="activity-feed">
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-person-plus"></i></div><div>New user registered successfully. <br><small style="opacity:0.7;">10 mins ago</small></div></div>
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-cpu"></i></div><div>Model ResNet50 training completed. <br><small style="opacity:0.7;">1 hour ago</small></div></div>
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-download"></i></div><div>Model weights (.h5) exported. <br><small style="opacity:0.7;">1 hour ago</small></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

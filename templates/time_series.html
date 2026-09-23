@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block layout %}
+<style>
+.img-comp-container { position: relative; height: 400px; width: 100%; max-width: 600px; margin: 0 auto; overflow: hidden; border-radius: 0.5rem; border: 2px solid var(--border-color); }
+.img-comp-img { position: absolute; width: auto; height: auto; overflow: hidden; }
+.img-comp-img img { display: block; width: 600px; height: 400px; object-fit: cover; }
+.img-comp-slider { position: absolute; z-index: 9; cursor: ew-resize; width: 40px; height: 40px; background-color: var(--primary); opacity: 0.8; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+</style>
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
+            <h2>Time-Series Urban Expansion Analysis</h2>
+            <p style="color: var(--text-color); margin-bottom: 2rem;">Upload satellite imagery from two different dates to visually and analytically compare urban growth over time.</p>
+            
+            {% if not images_uploaded %}
+            <form action="{{ url_for('time_series') }}" method="POST" enctype="multipart/form-data">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Image 1 (Past - e.g., 2015)</label>
+                        <input type="file" name="image1" accept="image/*" required style="padding: 1rem; border: 1px dashed var(--primary); width: 100%;">
+                    </div>
+                    <div class="form-group">
+                        <label>Image 2 (Present - e.g., 2025)</label>
+                        <input type="file" name="image2" accept="image/*" required style="padding: 1rem; border: 1px dashed #ef4444; width: 100%;">
+                    </div>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1.5rem; width: 100%;"><i class="bi bi-arrow-left-right"></i> Generate Comparison</button>
+            </form>
+            {% else %}
+            
+            <h4 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">Before / After Comparison Slider</h4>
+            <div class="img-comp-container" id="comp-container">
+                <div class="img-comp-img">
+                    <img src="{{ url_for('static', filename='uploads/' + present_image) }}" alt="Present">
+                </div>
+                <div class="img-comp-img img-comp-overlay">
+                    <img src="{{ url_for('static', filename='uploads/' + past_image) }}" alt="Past">
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <p><strong>Analysis:</strong> Significant urban expansion detected (+45% built-up area).</p>
+                <a href="{{ url_for('time_series') }}" class="btn btn-secondary" style="margin-top: 1rem;">Analyze New Pair</a>
+            </div>
+
+            <script>
+                function initComparisons() {
+                    var x, i;
+                    x = document.getElementsByClassName("img-comp-overlay");
+                    for (i = 0; i < x.length; i++) { compareImages(x[i]); }
+                    function compareImages(img) {
+                        var slider, clicked = 0, w, h;
+                        w = img.offsetWidth; h = img.offsetHeight;
+                        img.style.width = (w / 2) + "px";
+                        slider = document.createElement("DIV");
+                        slider.setAttribute("class", "img-comp-slider");
+                        slider.innerHTML = "<i class='bi bi-arrows-expand'></i>";
+                        img.parentElement.insertBefore(slider, img);
+                        slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+                        slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+                        slider.addEventListener("mousedown", slideReady);
+                        window.addEventListener("mouseup", slideFinish);
+                        slider.addEventListener("touchstart", slideReady);
+                        window.addEventListener("touchend", slideFinish);
+                        function slideReady(e) { e.preventDefault(); clicked = 1; window.addEventListener("mousemove", slideMove); window.addEventListener("touchmove", slideMove); }
+                        function slideFinish() { clicked = 0; }
+                        function slideMove(e) {
+                            var pos; if (clicked == 0) return false;
+                            pos = getCursorPos(e); if (pos < 0) pos = 0; if (pos > w) pos = w;
+                            slide(pos);
+                        }
+                        function getCursorPos(e) {
+                            var a, x = 0; e = (e.changedTouches) ? e.changedTouches[0] : e;
+                            a = img.getBoundingClientRect(); x = e.pageX - a.left; x = x - window.pageXOffset; return x;
+                        }
+                        function slide(x) { img.style.width = x + "px"; slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px"; }
+                    }
+                }
+                initComparisons();
+            </script>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

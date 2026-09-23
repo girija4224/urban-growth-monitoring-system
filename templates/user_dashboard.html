@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
+            <h2>Welcome {{ session.user }}</h2>
+            <p style="color: var(--text-color); margin-bottom: 2rem;">Today's Date: {{ date }}</p>
+            
+            <form action="{{ url_for('user_dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Select Pre-Trained Model</label>
+                    <select name="model_file" required>
+                        <option value="CNN">CNN</option>
+                        <option value="VGG16">VGG16</option>
+                        <option value="VGG19">VGG19</option>
+                        <option value="ResNet50">ResNet50</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Browse Input Remote Sensing Image</label>
+                    <input type="file" name="image" accept="image/*" required style="padding: 1rem; border: 1px dashed var(--primary); width: 100%;">
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1.5rem;"><i class="bi bi-cloud-upload"></i> Upload & Preprocess</button>
+            </form>
+            
+            <h4 style="margin-top: 3rem; color: var(--primary);">Recent Activity</h4>
+            <div class="activity-feed">
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-image"></i></div><div>Uploaded new satellite image for analysis. <br><small style="opacity:0.7;">Just now</small></div></div>
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-cpu"></i></div><div>Ran ResNet50 model (Prediction: Urban Detected). <br><small style="opacity:0.7;">2 hours ago</small></div></div>
+                <div class="activity-item"><div class="activity-icon"><i class="bi bi-file-earmark-pdf"></i></div><div>Exported prediction report as PDF. <br><small style="opacity:0.7;">1 day ago</small></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

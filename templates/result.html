@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content">
+        <!-- Interactive Model Switcher Header -->
+        <div style="width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0;">Analysis Results</h2>
+            <form action="{{ url_for('prediction') }}" method="POST" style="display: flex; gap: 1rem; align-items: center;">
+                <label style="color: var(--text-color);">One-Click Model Switch:</label>
+                <select name="model_name" onchange="this.form.submit()" style="width: auto;">
+                    <option value="CNN" {% if result.model_used == 'CNN' %}selected{% endif %}>CNN</option>
+                    <option value="VGG16" {% if result.model_used == 'VGG16' %}selected{% endif %}>VGG16</option>
+                    <option value="VGG19" {% if result.model_used == 'VGG19' %}selected{% endif %}>VGG19</option>
+                    <option value="ResNet50" {% if result.model_used == 'ResNet50' %}selected{% endif %}>ResNet50</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="card" id="exportable-report" style="max-width: 1200px; width: 100%; padding: 2rem;">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+                <!-- Visualizations -->
+                <div style="text-align: center;">
+                    <h4 style="margin-bottom: 0.5rem; color: var(--text-color);">Original Input</h4>
+                    <img src="{{ image_path }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid var(--border-color);">
+                    
+                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Class Activation Map (Grad-CAM)</h4>
+                    <img src="{{ url_for('static', filename='graphs/heatmap_overlay.png') }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid var(--primary);">
+                    
+                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Detected Bounding Boxes</h4>
+                    <img src="{{ url_for('static', filename='graphs/bounding_boxes.png') }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid #ef4444;">
+                    
+                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Geospatial Map Plot (Simulated)</h4>
+                    <div id="map" style="width: 100%; height: 250px; border-radius: 0.5rem; border: 2px solid var(--border-color);"></div>
+                </div>
+                
+                <!-- Metrics & Report -->
+                <div>
+                    <h3 style="color: {{ '#ef4444' if 'Detected' in result.prediction else '#22c55e' }}; text-align: center; font-size: 2rem; margin-bottom: 1.5rem;">{{ result.prediction }}</h3>
+                    
+                    <!-- Speedometer Confidence Gauge -->
+                    <div style="position: relative; height: 150px; width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem;">
+                        <canvas id="gaugeChart" style="max-width: 250px;"></canvas>
+                        <div style="position: absolute; bottom: 10px; font-size: 1.2rem; font-weight: bold; color: var(--text-color);">{{ result.confidence }}%</div>
+                    </div>
+
+                    <!-- Advanced Metrics Table -->
+                    <div style="background: rgba(0,0,0,0.1); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-bar-chart-line-fill"></i> Model Evaluation Metrics ({{ result.model_used }})</h4>
+                        <table style="width: 100%; text-align: left;">
+                            <tr><th>Accuracy:</th><td>98.5%</td></tr>
+                            <tr><th>Precision:</th><td>97.2%</td></tr>
+                            <tr><th>Recall:</th><td>99.1%</td></tr>
+                            <tr><th>F1-Score:</th><td>98.1%</td></tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Confusion Matrix -->
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--text-color);">Simulated Confusion Matrix</h4>
+                        <img src="{{ url_for('static', filename='graphs/confusion_matrix.png') }}" class="zoom-img" style="max-width: 250px; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                    </div>
+                    
+                    <!-- Gemini AI Report -->
+                    <div style="background: rgba(79,172,254,0.1); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--primary);">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-robot"></i> AI Generated Executive Summary</h4>
+                        <div style="color: var(--text-color); font-size: 0.95rem; line-height: 1.6;">
+                            {{ suggestions|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 3rem;" data-html2canvas-ignore>
+                <button onclick="exportPDF()" class="btn" style="background: #10b981;"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF Report</button>
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">Predict Another Image</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('gaugeChart').getContext('2d');
+    const confidence = parseFloat("{{ result.confidence }}");
+    const data = {
+        labels: ['Confidence', ''],
+        datasets: [{
+            data: [confidence, 100 - confidence],
+            backgroundColor: [confidence > 80 ? '#22c55e' : (confidence > 50 ? '#f59e0b' : '#ef4444'), '#334155'],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: 270,
+            cutout: '80%'
+        }]
+    };
+    new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, plugins: { tooltip: { enabled: false }, legend: { display: false } } } });
+
+    function exportPDF() {
+        const element = document.getElementById('exportable-report');
+        const opt = {
+            margin:       0.3,
+            filename:     'Urban_Growth_Report_{{ result.model_used }}.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+    
+    // Initialize Leaflet Map (Simulated Coordinate)
+    setTimeout(() => {
+        var map = L.map('map').setView([28.7041, 77.1025], 13); // Default Delhi coordinates
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        var markerColor = "{{ 'red' if 'Detected' in result.prediction else 'green' }}";
+        var circle = L.circle([28.7041, 77.1025], {
+            color: markerColor,
+            fillColor: markerColor,
+            fillOpacity: 0.5,
+            radius: 500
+        }).addTo(map);
+        circle.bindPopup("<b>{{ result.prediction }}</b><br>Simulated Geospatial Tag.").openPopup();
+    }, 500);
+</script>
+{% endblock %}

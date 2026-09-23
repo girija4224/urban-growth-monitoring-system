@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 1000px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>Prediction History</h2>
+                <a href="{{ url_for('export_excel') }}" class="btn" style="background: #10b981;">Export to Excel</a>
+            </div>
+            
+            <form action="{{ url_for('history') }}" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search by Date, Model, or Prediction..." style="flex: 1; padding: 0.75rem; border-radius: 0.5rem;">
+                <button type="submit" class="btn">Search</button>
+            </form>
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1rem; color: var(--primary);">Date</th>
+                            <th style="padding: 1rem; color: var(--primary);">Model Used</th>
+                            <th style="padding: 1rem; color: var(--primary);">Prediction</th>
+                            <th style="padding: 1rem; color: var(--primary);">Confidence</th>
+                            <th style="padding: 1rem; color: var(--primary);">Image Path</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td style="padding: 1rem;">{{ pred[4] }}</td>
+                            <td style="padding: 1rem;">{{ pred[1] }}</td>
+                            <td style="padding: 1rem;">
+                                <span style="color: {{ '#ef4444' if 'Detected' in pred[2] else '#22c55e' }}; font-weight: bold;">{{ pred[2] }}</span>
+                            </td>
+                            <td style="padding: 1rem;">{{ pred[3] }}%</td>
+                            <td style="padding: 1rem; font-size: 0.8rem; opacity: 0.7;">{{ pred[0] }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" style="text-align: center; padding: 2rem;">No predictions found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

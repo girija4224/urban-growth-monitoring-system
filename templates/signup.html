@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="main-content" style="justify-content: center;">
+    <div class="card" style="max-width: 600px;">
+        <h2>User Registration</h2>
+        <form action="{{ url_for('signup') }}" method="POST">
+            <div class="form-group"><label>Full Name</label><input type="text" name="name" pattern="[a-zA-Z ]+" required title="Alphabets only"></div>
+            <div class="form-group"><label>Username</label><input type="text" name="username" required></div>
+            <div class="form-group"><label>Email ID (Only Gmail)</label><input type="email" name="email" pattern=".+@gmail\.com" required></div>
+            <div class="form-group"><label>Phone Number (+91)</label><input type="tel" name="phone" pattern="\+91[0-9]{10}" placeholder="+91..." required></div>
+            <div class="form-group"><label>Password</label><input type="password" name="password" required></div>
+            <div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required></div>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+        <p style="text-align: center; margin-top: 1rem;">Already have an account? <a href="{{ url_for('login') }}">Sign In</a></p>
+    </div>
+</div>
+{% endblock %}

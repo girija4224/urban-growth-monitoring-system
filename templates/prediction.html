@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content" style="justify-content: center;">
+        <div class="card" style="text-align: center; max-width: 600px; padding: 3rem;">
+            <h2>Model Comparison & Prediction</h2>
+            <div style="margin: 2rem 0;">
+                <i class="bi bi-cpu" style="font-size: 4rem; color: var(--primary); animation: pulse 1.5s infinite;"></i>
+                <style>@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }</style>
+                <p style="margin-top: 1rem; font-size: 1.2rem;" id="pred-status">Loading Model Architecture...</p>
+                
+                <div class="progress-container" style="margin-top: 1rem;">
+                    <div class="progress-bar" id="pred-bar"></div>
+                </div>
+            </div>
+            
+            <script>
+                setTimeout(() => { document.getElementById('pred-bar').style.width = '25%'; document.getElementById('pred-status').innerText = 'Extracting Features...'; }, 500);
+                setTimeout(() => { document.getElementById('pred-bar').style.width = '75%'; document.getElementById('pred-status').innerText = 'Running Inference...'; }, 1500);
+                setTimeout(() => { document.getElementById('pred-bar').style.width = '100%'; document.getElementById('pred-status').innerText = 'Generating Final Report...'; }, 2500);
+                setTimeout(() => { window.location.href = "{{ url_for('result') }}"; }, 3000);
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

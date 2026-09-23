@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'admin_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 900px; width: 100%; padding: 2rem;">
+            <h2>Create & Train Deep Learning Models</h2>
+            
+            <form id="trainForm" onsubmit="startTraining(event)">
+                <div class="form-group">
+                    <label>Select Model to Train</label>
+                    <select name="model_type" id="modelType" required>
+                        <option value="CNN">CNN</option>
+                        <option value="VGG16">VGG16</option>
+                        <option value="VGG19">VGG19</option>
+                        <option value="ResNet50">ResNet50</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group"><label>Epochs</label><input type="number" id="epochs" value="10" required></div>
+                    <div class="form-group"><label>Batch Size</label><input type="number" value="32" required></div>
+                    <div class="form-group"><label>Learning Rate</label><input type="number" step="0.001" value="0.001" required></div>
+                    <div class="form-group"><label>Optimizer</label><select><option>Adam</option><option>SGD</option></select></div>
+                </div>
+                <button type="submit" class="btn" id="trainBtn" style="margin-top: 1rem;"><i class="bi bi-play-circle-fill"></i> Start Live Training Simulation</button>
+            </form>
+            
+            <!-- Real-time Training Charts -->
+            <div id="trainingVisuals" style="display: none; margin-top: 2rem;">
+                <h4 style="text-align: center; color: var(--primary);">Live Training Progress</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    <div><canvas id="accChart"></canvas></div>
+                    <div><canvas id="lossChart"></canvas></div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; color: #10b981; font-weight: bold;" id="trainStatus"></div>
+                
+                <!-- Export Links (Hidden until done) -->
+                <div id="exportLinks" style="display: none; margin-top: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.1); border-radius: 0.5rem; border: 1px solid var(--border-color); text-align: center;">
+                    <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-download"></i> Export Trained Model</h4>
+                    <p style="margin-bottom: 1rem; font-size: 0.9rem;">Download the model weights and architecture in your preferred format:</p>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                        <a id="dl-h5" class="btn btn-secondary" style="width: auto;">.h5</a>
+                        <a id="dl-json" class="btn btn-secondary" style="width: auto;">.json</a>
+                        <a id="dl-pt" class="btn btn-secondary" style="width: auto;">.pt</a>
+                        <a id="dl-pkl" class="btn btn-secondary" style="width: auto;">.pkl</a>
+                        <a id="dl-onnx" class="btn btn-secondary" style="width: auto;">.onnx</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let accChart, lossChart;
+    
+    function startTraining(e) {
+        e.preventDefault();
+        document.getElementById('trainBtn').disabled = true;
+        document.getElementById('trainBtn').innerText = 'Training in Progress...';
+        document.getElementById('trainingVisuals').style.display = 'block';
+        document.getElementById('exportLinks').style.display = 'none';
+        document.getElementById('trainStatus').innerText = 'Initializing...';
+        
+        const epochs = parseInt(document.getElementById('epochs').value);
+        const modelType = document.getElementById('modelType').value;
+        
+        const accCtx = document.getElementById('accChart').getContext('2d');
+        const lossCtx = document.getElementById('lossChart').getContext('2d');
+        if(accChart) { accChart.destroy(); lossChart.destroy(); }
+        
+        accChart = new Chart(accCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Accuracy', data: [], borderColor: '#10b981', tension: 0.1 }] }});
+        lossChart = new Chart(lossCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Loss', data: [], borderColor: '#ef4444', tension: 0.1 }] }});
+        
+        let currentEpoch = 0;
+        let accuracy = 0.5;
+        let loss = 1.0;
+        
+        const interval = setInterval(() => {
+            currentEpoch++;
+            accuracy = Math.min(0.99, accuracy + (Math.random() * 0.1));
+            loss = Math.max(0.01, loss - (Math.random() * 0.15));
+            
+            accChart.data.labels.push(`Ep ${currentEpoch}`);
+            accChart.data.datasets[0].data.push(accuracy);
+            accChart.update();
+            
+            lossChart.data.labels.push(`Ep ${currentEpoch}`);
+            lossChart.data.datasets[0].data.push(loss);
+            lossChart.update();
+            
+            document.getElementById('trainStatus').innerText = `Training Epoch ${currentEpoch}/${epochs}...`;
+            
+            if (currentEpoch >= epochs) {
+                clearInterval(interval);
+                document.getElementById('trainBtn').disabled = false;
+                document.getElementById('trainBtn').innerText = 'Start Live Training Simulation';
+                document.getElementById('trainStatus').innerText = 'Training Completed Successfully!';
+                
+                // Set Download Links
+                const formats = ['h5', 'json', 'pt', 'pkl', 'onnx'];
+                formats.forEach(f => {
+                    document.getElementById(`dl-${f}`).href = `/download_model/${modelType.toLowerCase()}_model.${f}`;
+                });
+                document.getElementById('exportLinks').style.display = 'block';
+            }
+        }, 800);
+    }
+</script>
+{% endblock %}

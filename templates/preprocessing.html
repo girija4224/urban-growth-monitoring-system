@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'user_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
+            <h2>Input Image Preprocessing</h2>
+            <div style="display: flex; gap: 2rem; margin-top: 2rem;">
+                <div style="flex: 1; text-align: center;">
+                    <p style="margin-bottom: 1rem;">Original Image</p>
+                    <img src="{{ image_path }}" style="max-width: 100%; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                </div>
+                <div style="flex: 1; background: rgba(0,0,0,0.1); padding: 1.5rem; border-radius: 0.5rem;">
+                    <h4 style="margin-bottom: 1rem; color: var(--primary);">Display Information</h4>
+                    <ul style="list-style: none; color: var(--text-color); line-height: 2;">
+                        <li><strong>Original Size:</strong> {{ shapes.original[0] }}x{{ shapes.original[1] }}</li>
+                        <li><strong>Resized Size:</strong> {{ shapes.resized[0] }}x{{ shapes.resized[1] }}</li>
+                        <li><strong>Channels:</strong> RGB (3)</li>
+                        <li><strong>Normalized:</strong> Yes (0 to 1)</li>
+                    </ul>
+                    
+                    <!-- Interactive Progress Bar -->
+                    <div style="margin-top: 1.5rem;">
+                        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;" id="prep-status">Initializing Preprocessing...</p>
+                        <div class="progress-container">
+                            <div class="progress-bar" id="prep-bar"></div>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('visualization') }}" class="btn" id="next-btn" style="margin-top: 1.5rem; display: none;">Proceed to Visualization</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(() => { document.getElementById('prep-bar').style.width = '30%'; document.getElementById('prep-status').innerText = 'Resizing...'; }, 500);
+    setTimeout(() => { document.getElementById('prep-bar').style.width = '60%'; document.getElementById('prep-status').innerText = 'Converting Color Space...'; }, 1000);
+    setTimeout(() => { document.getElementById('prep-bar').style.width = '100%'; document.getElementById('prep-status').innerText = 'Normalization Complete!'; document.getElementById('next-btn').style.display = 'inline-block'; }, 1500);
+</script>
+{% endblock %}

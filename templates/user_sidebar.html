@@ -1,0 +1,12 @@
+
+<div class="sidebar">
+    <h3 style="color: var(--text-color, white); margin-bottom: 2rem; font-size: 1.2rem; text-align: center;">User Menu</h3>
+    <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('time_series') }}">Time-Series Expansion</a>
+    <a href="{{ url_for('preprocessing') }}">Preprocessing</a>
+    <a href="{{ url_for('visualization') }}">Visualization</a>
+    <a href="{{ url_for('prediction') }}">Prediction</a>
+    <a href="{{ url_for('result') }}">Result</a>
+    <a href="{{ url_for('history') }}">Prediction History</a>
+    <a href="{{ url_for('logout') }}" style="margin-top: auto; color: #ef4444;">Logout</a>
+</div>

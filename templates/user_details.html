@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block layout %}
+<div class="layout">
+    {% include 'admin_sidebar.html' %}
+    <div class="main-content">
+        <div class="card" style="max-width: 1000px; width: 100%;">
+            <h2>Registered Users</h2>
+            <div style="overflow-x: auto; margin-top: 1.5rem;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Name</th>
+                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Username</th>
+                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Email</th>
+                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Phone</th>
+                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Registration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[0] }}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[1] }}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[2] }}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[3] }}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 2rem; text-align: right;">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="width: auto;">Return to Admin Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
