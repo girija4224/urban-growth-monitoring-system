@@ -1,14 +1,12 @@
-﻿Flask
+Flask
 Werkzeug
-tensorflow
 numpy
 Pillow
 matplotlib
 pandas
-scikit-learn
 google-generativeai
 opencv-python-headless
 seaborn
 openpyxl
 python-dotenv
-gunicorn
+requests

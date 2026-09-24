@@ -1,9 +1,36 @@
-
 <div class="sidebar">
-    <h3 style="color: white; margin-bottom: 2rem; font-size: 1.2rem; text-align: center;">Admin Menu</h3>
-    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('upload_dataset') }}">Upload Dataset</a>
-    <a href="{{ url_for('train_model') }}">Train Models</a>
-    <a href="{{ url_for('user_details') }}">View User Details</a>
-    <a href="{{ url_for('logout') }}" style="margin-top: auto; color: #ef4444;">Logout</a>
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <div>
+            <div class="sidebar-brand-text">Admin Panel</div>
+            <span class="sidebar-brand-sub">System Control</span>
+        </div>
+    </div>
+
+    <div class="sidebar-label">Management</div>
+    <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Overview</span>
+    </a>
+    <a href="{{ url_for('upload_dataset') }}" class="{% if request.endpoint == 'upload_dataset' %}active{% endif %}">
+        <i class="bi bi-cloud-arrow-up-fill"></i>
+        <span>Upload Dataset</span>
+    </a>
+    <a href="{{ url_for('train_model') }}" class="{% if request.endpoint == 'train_model' %}active{% endif %}">
+        <i class="bi bi-cpu-fill"></i>
+        <span>Train Models</span>
+    </a>
+    <a href="{{ url_for('user_details') }}" class="{% if request.endpoint == 'user_details' %}active{% endif %}">
+        <i class="bi bi-people-fill"></i>
+        <span>Registered Users</span>
+    </a>
+
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" style="color: var(--accent-rose);">
+            <i class="bi bi-box-arrow-left" style="color: var(--accent-rose);"></i>
+            <span>Log Out</span>
+        </a>
+    </div>
 </div>

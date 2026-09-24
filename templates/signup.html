@@ -1,18 +1,60 @@
 {% extends "base.html" %}
+{% block title %}Create Account — Urban Growth AI{% endblock %}
+
 {% block layout %}
-<div class="main-content" style="justify-content: center;">
-    <div class="card" style="max-width: 600px;">
-        <h2>User Registration</h2>
+<div class="main-content" style="justify-content: center; min-height: 100vh; padding: 2rem 1rem;">
+    <div class="card" style="max-width: 540px; width: 100%; padding: 2.5rem 2.25rem;">
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--primary-gradient); display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; margin-bottom: 1rem; box-shadow: 0 8px 24px var(--primary-glow);">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            <h2 style="font-size: 1.75rem; margin-bottom: 0.35rem;">Register New Account</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Join the AI-driven urban growth monitoring platform</p>
+        </div>
+
         <form action="{{ url_for('signup') }}" method="POST">
-            <div class="form-group"><label>Full Name</label><input type="text" name="name" pattern="[a-zA-Z ]+" required title="Alphabets only"></div>
-            <div class="form-group"><label>Username</label><input type="text" name="username" required></div>
-            <div class="form-group"><label>Email ID (Only Gmail)</label><input type="email" name="email" pattern=".+@gmail\.com" required></div>
-            <div class="form-group"><label>Phone Number (+91)</label><input type="tel" name="phone" pattern="\+91[0-9]{10}" placeholder="+91..." required></div>
-            <div class="form-group"><label>Password</label><input type="password" name="password" required></div>
-            <div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required></div>
-            <button type="submit" class="btn">Submit</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label><i class="bi bi-card-heading"></i> Full Name</label>
+                    <input type="text" name="name" pattern="[a-zA-Z ]+" required placeholder="First and last name">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="bi bi-person"></i> Username</label>
+                    <input type="text" name="username" placeholder="Choose username" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="bi bi-telephone"></i> Phone (+91)</label>
+                    <input type="tel" name="phone" pattern="\+91[0-9]{10}" placeholder="+919876543210" required>
+                </div>
+
+                <div class="form-group" style="grid-column: span 2;">
+                    <label><i class="bi bi-envelope"></i> Email Address (Gmail)</label>
+                    <input type="email" name="email" pattern=".+@gmail\.com" placeholder="name@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="bi bi-lock"></i> Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="bi bi-shield-check"></i> Confirm</label>
+                    <input type="password" name="confirm_password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; margin-top: 1rem; padding: 0.95rem;">
+                <i class="bi bi-check2-circle"></i> Complete Registration
+            </button>
         </form>
-        <p style="text-align: center; margin-top: 1rem;">Already have an account? <a href="{{ url_for('login') }}">Sign In</a></p>
+
+        <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-subtle); font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? 
+            <a href="{{ url_for('login') }}" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Sign In</a>
+        </div>
     </div>
 </div>
 {% endblock %}

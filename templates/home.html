@@ -1,15 +1,58 @@
 {% extends "base.html" %}
-{% block body_class %}full-bg{% endblock %}
+{% block title %}Urban Growth AI — Deep Learning Remote Sensing System{% endblock %}
+
 {% block layout %}
-<div class="home-overlay">
-    <div style="text-align: center; max-width: 800px; padding: 2rem;">
-        <h1 style="font-size: 3rem; margin-bottom: 1rem;">AI/ML Based Urban Growth Monitoring</h1>
-        <p style="font-size: 1.2rem; color: #e2e8f0; margin-bottom: 3rem;">Urban Growth Detection using Remote Sensing Images and Deep Learning</p>
-        
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ url_for('signup') }}" class="btn">User Sign Up</a>
-            <a href="{{ url_for('login') }}" class="btn btn-secondary">User Sign In</a>
-            <a href="{{ url_for('admin_login') }}" class="btn btn-secondary">Admin Login</a>
+<div class="home-hero">
+    <div class="home-badge">
+        <i class="bi bi-stars"></i>
+        <span>AI-Powered Satellite Remote Sensing Analysis</span>
+    </div>
+
+    <h1 class="hero-title">
+        Next-Gen Urban Growth <br>
+        <span class="gradient-title">Monitoring & Intelligence</span>
+    </h1>
+
+    <p class="hero-subtitle">
+        Automated classification of urban vs. non-urban land areas from high-resolution satellite imagery with deep neural networks, Grad-CAM activation, and time-series expansion metrics.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+        <a href="{{ url_for('signup') }}" class="btn" style="padding: 1rem 2.2rem; font-size: 1.05rem;">
+            <i class="bi bi-rocket-takeoff-fill"></i> Get Started
+        </a>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.05rem;">
+            <i class="bi bi-box-arrow-in-right"></i> User Sign In
+        </a>
+        <a href="{{ url_for('admin_login') }}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.05rem;">
+            <i class="bi bi-shield-lock-fill"></i> Admin Console
+        </a>
+    </div>
+
+    <!-- Modern Highlights Grid -->
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="feature-icon"><i class="bi bi-globe-americas"></i></div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Remote Sensing Vision</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Process multispectral and RGB satellite imagery to categorize built-up settlements and natural topography.
+            </p>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Multi-Architecture Deep Learning</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Switch between Custom CNN, VGG16, VGG19, and ResNet50 architectures with instant benchmark comparisons.
+            </p>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon"><i class="bi bi-clock-history"></i></div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Time-Series Expansion</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Interactive dual-layer image comparison slider to track horizontal urban sprawl over decades.
+            </p>
         </div>
     </div>
 </div>

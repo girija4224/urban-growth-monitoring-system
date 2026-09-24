@@ -1,52 +1,102 @@
 {% extends "base.html" %}
+{% block title %}Train Neural Architectures — Urban Growth AI Console{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'admin_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 900px; width: 100%; padding: 2rem;">
-            <h2>Create & Train Deep Learning Models</h2>
+        <div style="width: 100%; max-width: 950px;">
             
-            <form id="trainForm" onsubmit="startTraining(event)">
-                <div class="form-group">
-                    <label>Select Model to Train</label>
-                    <select name="model_type" id="modelType" required>
-                        <option value="CNN">CNN</option>
-                        <option value="VGG16">VGG16</option>
-                        <option value="VGG19">VGG19</option>
-                        <option value="ResNet50">ResNet50</option>
-                    </select>
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Train Deep Learning Architectures</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Configure hyperparameters and execute live epoch loss & accuracy simulations</p>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group"><label>Epochs</label><input type="number" id="epochs" value="10" required></div>
-                    <div class="form-group"><label>Batch Size</label><input type="number" value="32" required></div>
-                    <div class="form-group"><label>Learning Rate</label><input type="number" step="0.001" value="0.001" required></div>
-                    <div class="form-group"><label>Optimizer</label><select><option>Adam</option><option>SGD</option></select></div>
+            </div>
+
+            <!-- Hyperparameters Form -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.15rem;"><i class="bi bi-sliders" style="color: var(--accent-cyan);"></i> Hyperparameter Tuning</h3>
                 </div>
-                <button type="submit" class="btn" id="trainBtn" style="margin-top: 1rem;"><i class="bi bi-play-circle-fill"></i> Start Live Training Simulation</button>
-            </form>
-            
-            <!-- Real-time Training Charts -->
-            <div id="trainingVisuals" style="display: none; margin-top: 2rem;">
-                <h4 style="text-align: center; color: var(--primary);">Live Training Progress</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
-                    <div><canvas id="accChart"></canvas></div>
-                    <div><canvas id="lossChart"></canvas></div>
+
+                <form id="trainForm" onsubmit="startTraining(event)">
+                    <div class="form-group">
+                        <label><i class="bi bi-cpu"></i> Neural Network Backbone</label>
+                        <select name="model_type" id="modelType" required>
+                            <option value="CNN">Custom 4-Layer CNN (Fast)</option>
+                            <option value="VGG16">VGG16 Feature Pyramid</option>
+                            <option value="VGG19">VGG19 Deep Convolutional</option>
+                            <option value="ResNet50" selected>ResNet50 Residual Network</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label><i class="bi bi-arrow-repeat"></i> Epochs</label>
+                            <input type="number" id="epochs" value="10" min="1" max="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-stack"></i> Batch Size</label>
+                            <input type="number" value="32" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-graph-up-arrow"></i> Learning Rate</label>
+                            <input type="number" step="0.0001" value="0.001" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-gear"></i> Optimizer</label>
+                            <select>
+                                <option>Adam (Adaptive Moments)</option>
+                                <option>SGD with Momentum</option>
+                                <option>RMSprop</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; text-align: right;">
+                        <button type="submit" class="btn" id="trainBtn" style="min-width: 260px;">
+                            <i class="bi bi-play-circle-fill"></i> Launch Epoch Training
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Real-time Training Dashboard -->
+            <div id="trainingVisuals" class="card" style="display: none; margin-bottom: 2rem;">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.15rem;"><i class="bi bi-graph-up" style="color: var(--accent-emerald);"></i> Live Convergence Metrics</h3>
+                    <div id="trainStatus" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan); font-family: 'JetBrains Mono';"></div>
                 </div>
-                <div style="text-align: center; margin-top: 1rem; color: #10b981; font-weight: bold;" id="trainStatus"></div>
-                
-                <!-- Export Links (Hidden until done) -->
-                <div id="exportLinks" style="display: none; margin-top: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.1); border-radius: 0.5rem; border: 1px solid var(--border-color); text-align: center;">
-                    <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-download"></i> Export Trained Model</h4>
-                    <p style="margin-bottom: 1rem; font-size: 0.9rem;">Download the model weights and architecture in your preferred format:</p>
-                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                        <a id="dl-h5" class="btn btn-secondary" style="width: auto;">.h5</a>
-                        <a id="dl-json" class="btn btn-secondary" style="width: auto;">.json</a>
-                        <a id="dl-pt" class="btn btn-secondary" style="width: auto;">.pt</a>
-                        <a id="dl-pkl" class="btn btn-secondary" style="width: auto;">.pkl</a>
-                        <a id="dl-onnx" class="btn btn-secondary" style="width: auto;">.onnx</a>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-emerald); margin-bottom: 0.75rem;">Accuracy Curve</div>
+                        <canvas id="accChart"></canvas>
+                    </div>
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-rose); margin-bottom: 0.75rem;">Loss Curve (Cross-Entropy)</div>
+                        <canvas id="lossChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Export Model Weights -->
+                <div id="exportLinks" style="display: none; margin-top: 2rem; padding: 1.5rem; background: var(--surface-2); border-radius: var(--radius-md); border: 1px solid var(--border-active); text-align: center;">
+                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 0.35rem;">
+                        <i class="bi bi-check-circle-fill" style="color: var(--accent-emerald);"></i> Checkpoint Reached & Weights Exportable
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                        Download calibrated weight artifacts for deployment or external inference frameworks:
+                    </p>
+                    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                        <a id="dl-h5" class="btn btn-secondary btn-sm"><i class="bi bi-file-earmark-code"></i> Keras .h5</a>
+                        <a id="dl-pt" class="btn btn-secondary btn-sm"><i class="bi bi-file-earmark-code"></i> PyTorch .pt</a>
+                        <a id="dl-onnx" class="btn btn-secondary btn-sm"><i class="bi bi-file-earmark-code"></i> ONNX Runtime</a>
+                        <a id="dl-json" class="btn btn-secondary btn-sm"><i class="bi bi-file-earmark-code"></i> Model .json</a>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -56,11 +106,12 @@
     
     function startTraining(e) {
         e.preventDefault();
-        document.getElementById('trainBtn').disabled = true;
-        document.getElementById('trainBtn').innerText = 'Training in Progress...';
+        const trainBtn = document.getElementById('trainBtn');
+        trainBtn.disabled = true;
+        trainBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Training in Progress...';
         document.getElementById('trainingVisuals').style.display = 'block';
         document.getElementById('exportLinks').style.display = 'none';
-        document.getElementById('trainStatus').innerText = 'Initializing...';
+        document.getElementById('trainStatus').innerText = 'Initializing Tensor Graph...';
         
         const epochs = parseInt(document.getElementById('epochs').value);
         const modelType = document.getElementById('modelType').value;
@@ -69,17 +120,25 @@
         const lossCtx = document.getElementById('lossChart').getContext('2d');
         if(accChart) { accChart.destroy(); lossChart.destroy(); }
         
-        accChart = new Chart(accCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Accuracy', data: [], borderColor: '#10b981', tension: 0.1 }] }});
-        lossChart = new Chart(lossCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Loss', data: [], borderColor: '#ef4444', tension: 0.1 }] }});
+        accChart = new Chart(accCtx, { 
+            type: 'line', 
+            data: { labels: [], datasets: [{ label: 'Accuracy', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.2, fill: true }] },
+            options: { scales: { y: { min: 0, max: 1 } } }
+        });
+        lossChart = new Chart(lossCtx, { 
+            type: 'line', 
+            data: { labels: [], datasets: [{ label: 'Loss', data: [], borderColor: '#f43f5e', backgroundColor: 'rgba(244, 63, 94, 0.1)', tension: 0.2, fill: true }] },
+            options: { scales: { y: { min: 0, max: 1.5 } } }
+        });
         
         let currentEpoch = 0;
-        let accuracy = 0.5;
-        let loss = 1.0;
+        let accuracy = 0.55;
+        let loss = 0.95;
         
         const interval = setInterval(() => {
             currentEpoch++;
-            accuracy = Math.min(0.99, accuracy + (Math.random() * 0.1));
-            loss = Math.max(0.01, loss - (Math.random() * 0.15));
+            accuracy = Math.min(0.99, accuracy + (Math.random() * 0.08));
+            loss = Math.max(0.02, loss - (Math.random() * 0.12));
             
             accChart.data.labels.push(`Ep ${currentEpoch}`);
             accChart.data.datasets[0].data.push(accuracy);
@@ -89,22 +148,21 @@
             lossChart.data.datasets[0].data.push(loss);
             lossChart.update();
             
-            document.getElementById('trainStatus').innerText = `Training Epoch ${currentEpoch}/${epochs}...`;
+            document.getElementById('trainStatus').innerText = `Epoch ${currentEpoch}/${epochs} | Acc: ${(accuracy*100).toFixed(1)}%`;
             
             if (currentEpoch >= epochs) {
                 clearInterval(interval);
-                document.getElementById('trainBtn').disabled = false;
-                document.getElementById('trainBtn').innerText = 'Start Live Training Simulation';
-                document.getElementById('trainStatus').innerText = 'Training Completed Successfully!';
+                trainBtn.disabled = false;
+                trainBtn.innerHTML = '<i class="bi bi-play-circle-fill"></i> Launch Epoch Training';
+                document.getElementById('trainStatus').innerHTML = '<span style="color: var(--accent-emerald);">Convergence Achieved</span>';
                 
-                // Set Download Links
-                const formats = ['h5', 'json', 'pt', 'pkl', 'onnx'];
-                formats.forEach(f => {
-                    document.getElementById(`dl-${f}`).href = `/download_model/${modelType.toLowerCase()}_model.${f}`;
+                ['h5', 'json', 'pt', 'onnx'].forEach(f => {
+                    const el = document.getElementById(`dl-${f}`);
+                    if(el) el.href = `/download_model/${modelType.toLowerCase()}_model.${f}`;
                 });
                 document.getElementById('exportLinks').style.display = 'block';
             }
-        }, 800);
+        }, 600);
     }
 </script>
 {% endblock %}

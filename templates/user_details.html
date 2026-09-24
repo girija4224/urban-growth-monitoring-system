@@ -1,37 +1,64 @@
 {% extends "base.html" %}
+{% block title %}User Directory — Urban Growth AI Console{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'admin_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 1000px; width: 100%;">
-            <h2>Registered Users</h2>
-            <div style="overflow-x: auto; margin-top: 1.5rem;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Name</th>
-                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Username</th>
-                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Email</th>
-                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Phone</th>
-                            <th style="padding: 1rem; border-bottom: 1px solid #cbd5e1; color: #4facfe;">Registration Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr>
-                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[0] }}</td>
-                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[1] }}</td>
-                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[2] }}</td>
-                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[3] }}</td>
-                            <td style="padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ user[4] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div style="width: 100%; max-width: 1050px;">
+            
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Registered User Directory</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Active authenticated researcher accounts and telemetry logs</p>
+                </div>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Console Overview
+                </a>
             </div>
-            <div style="margin-top: 2rem; text-align: right;">
-                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" style="width: auto;">Return to Admin Dashboard</a>
+
+            <div class="card">
+                <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Researcher Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Registered Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td style="font-weight: 600; color: var(--text-main);">
+                                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem;">
+                                            {{ user[0][0] if user[0] else 'U' }}
+                                        </div>
+                                        <span>{{ user[0] }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--accent-cyan);">@{{ user[1] }}</span>
+                                </td>
+                                <td style="color: var(--text-muted); font-size: 0.875rem;">{{ user[2] }}</td>
+                                <td style="color: var(--text-muted); font-size: 0.875rem;">{{ user[3] }}</td>
+                                <td style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-dim);">{{ user[4] }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                    No registered users recorded in database.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 </div>

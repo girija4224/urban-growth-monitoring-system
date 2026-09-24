@@ -59,50 +59,66 @@ Visualization & AI Insights
 ```text
 urban-growth-monitoring-system/
 │
-├── app.py
-├── database.py
-├── requirements.txt
-├── generate_templates.py
-├── update_templates.py
-├── update_templates_2.py
-├── update_templates_3.py
+├── vercel.json                 # Vercel serverless deployment config
+├── requirements.txt            # Streamlined Python runtime dependencies
 │
-├── dataset/
-│   ├── train/
-│   │   ├── urban/
-│   │   └── non-urban/
+├── [ FRONTEND ]
+│   ├── templates/              # Modern glassmorphism UI templates
+│   │   ├── base.html           # Core layout, top controls & floating AI chatbot
+│   │   ├── home.html           # Landing page with interactive hero
+│   │   ├── login.html          # User authentication sign-in
+│   │   ├── signup.html         # User account registration
+│   │   ├── user_dashboard.html # Image upload & model selection
+│   │   ├── user_sidebar.html   # User navigation menu
+│   │   ├── preprocessing.html  # Image tensor normalization & dimensions
+│   │   ├── visualization.html  # Spectral histograms & scatter analytics
+│   │   ├── prediction.html     # Real-time forward pass animation
+│   │   ├── result.html         # Grad-CAM heatmap, metrics & Leaflet map
+│   │   ├── time_series.html    # Interactive temporal sprawl comparison slider
+│   │   ├── history.html        # Historical inference table with Excel export
+│   │   ├── admin_login.html    # Administrative credential portal
+│   │   ├── admin_dashboard.html# Platform overview & metric widgets
+│   │   ├── admin_sidebar.html  # Administrative navigation menu
+│   │   ├── train_model.html    # Hyperparameter tuning & live epoch curves
+│   │   ├── upload_dataset.html # Satellite dataset split verification
+│   │   └── user_details.html   # Registered researcher directory
 │   │
-│   └── test/
-│       ├── urban/
-│       └── non-urban/
+│   └── static/                 # Static assets & generated visuals
+│       ├── css/
+│       │   └── style.css       # Custom futuristic responsive theme
+│       ├── graphs/             # Generated analytics & confusion matrices
+│       └── uploads/            # Temporary image buffer
 │
-├── ml/
-│   ├── __init__.py
-│   ├── data_processing.py
-│   ├── inference.py
-│   ├── models.py
-│   ├── train.py
-│   └── visualization.py
+├── [ BACKEND ]
+│   ├── app.py                  # Main Flask application & routing gateway
+│   ├── database.py             # SQLite user management & inference persistence
+│   │
+│   ├── preprocessing/          # Remote sensing transformation engine
+│   │   └── process.py          # Resizing, BGR/RGB conversion, normalization
+│   │
+│   ├── prediction/             # Inference & AI synthesis pipeline
+│   │   ├── infer.py            # Model forward-pass & classification
+│   │   ├── visualize.py        # Heatmaps, Grad-CAM & bounding box detection
+│   │   └── gemini_helper.py    # Gemini AI planning recommendations & chatbot
+│   │
+│   ├── ml/                     # Machine learning architectures
+│   │   ├── models.py           # Deep learning model topologies
+│   │   ├── data_processing.py  # Data loaders & generators
+│   │   ├── train.py            # Model training & optimization loops
+│   │   └── visualization.py    # Training history metrics
+│   │
+│   └── training/               # Experimental training definitions
+│       └── models.py
 │
-├── prediction/
-│   ├── __init__.py
-│   ├── gemini_helper.py
-│   ├── infer.py
-│   └── visualize.py
+├── dataset/                    # Satellite imagery splits
+│   ├── train/                  # Urban and non-urban training images
+│   └── test/                   # Urban and non-urban testing images
 │
-├── preprocessing/
-│   ├── __init__.py
-│   └── process.py
-│
-├── training/
-│   ├── __init__.py
-│   └── models.py
-│
-├── static/
-│   ├── css/
-│   └── graphs/
-│
-└── templates/
+└── scripts/                    # Development & utility scripts
+    ├── generate_templates.py
+    ├── update_templates.py
+    ├── update_templates_2.py
+    └── update_templates_3.py
 ```
 
 ## 🗂️ Dataset

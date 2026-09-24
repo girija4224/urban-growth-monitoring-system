@@ -1,9 +1,15 @@
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 import numpy as np
 import os
 import random
 import time
+
+try:
+    import tensorflow as tf
+    from tensorflow.keras.models import load_model
+except ImportError:
+    tf = None
+    load_model = None
+
 
 def predict_image(image_data, model_name):
     """

@@ -1,41 +1,104 @@
 {% extends "base.html" %}
+{% block title %}Image Preprocessing — Urban Growth AI{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'user_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
-            <h2>Input Image Preprocessing</h2>
-            <div style="display: flex; gap: 2rem; margin-top: 2rem;">
-                <div style="flex: 1; text-align: center;">
-                    <p style="margin-bottom: 1rem;">Original Image</p>
-                    <img src="{{ image_path }}" style="max-width: 100%; border-radius: 0.5rem; border: 1px solid var(--border-color);">
-                </div>
-                <div style="flex: 1; background: rgba(0,0,0,0.1); padding: 1.5rem; border-radius: 0.5rem;">
-                    <h4 style="margin-bottom: 1rem; color: var(--primary);">Display Information</h4>
-                    <ul style="list-style: none; color: var(--text-color); line-height: 2;">
-                        <li><strong>Original Size:</strong> {{ shapes.original[0] }}x{{ shapes.original[1] }}</li>
-                        <li><strong>Resized Size:</strong> {{ shapes.resized[0] }}x{{ shapes.resized[1] }}</li>
-                        <li><strong>Channels:</strong> RGB (3)</li>
-                        <li><strong>Normalized:</strong> Yes (0 to 1)</li>
-                    </ul>
-                    
-                    <!-- Interactive Progress Bar -->
-                    <div style="margin-top: 1.5rem;">
-                        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;" id="prep-status">Initializing Preprocessing...</p>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="prep-bar"></div>
-                        </div>
-                    </div>
-                    
-                    <a href="{{ url_for('visualization') }}" class="btn" id="next-btn" style="margin-top: 1.5rem; display: none;">Proceed to Visualization</a>
+        <div style="width: 100%; max-width: 950px;">
+            
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Image Normalization & Preprocessing</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Step 1 of 3: Matrix dimension formatting and spectral channel alignment</p>
                 </div>
             </div>
+
+            <div class="card">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+                    
+                    <!-- Left: Original Image Preview -->
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            Uploaded Raster Image
+                        </div>
+                        <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--glass-shadow);">
+                            <img src="{{ image_path }}" style="width: 100%; display: block;">
+                        </div>
+                    </div>
+
+                    <!-- Right: Technical Dimensional Analysis -->
+                    <div>
+                        <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="bi bi-aspect-ratio-fill"></i> Dimensional Specifications
+                            </h4>
+                            <table>
+                                <tr>
+                                    <th>Raw Resolution</th>
+                                    <td style="font-family: 'JetBrains Mono';">{{ shapes.original[0] }} × {{ shapes.original[1] }} px</td>
+                                </tr>
+                                <tr>
+                                    <th>Target Tensor Tensor</th>
+                                    <td style="font-family: 'JetBrains Mono'; color: var(--accent-cyan);">{{ shapes.resized[0] }} × {{ shapes.resized[1] }} px</td>
+                                </tr>
+                                <tr>
+                                    <th>Spectral Bands</th>
+                                    <td>RGB 3-Channel</td>
+                                </tr>
+                                <tr>
+                                    <th>Normalization</th>
+                                    <td style="color: var(--accent-emerald); font-weight: 600;">Floating Point [0.0 - 1.0]</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Animated Status Indicator -->
+                        <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);" id="prep-status">
+                                    <i class="bi bi-gear-wide-connected"></i> Initializing preprocessing pipeline...
+                                </span>
+                                <span style="font-size: 0.8rem; font-family: 'JetBrains Mono'; color: var(--accent-cyan);" id="prep-pct">0%</span>
+                            </div>
+
+                            <div style="width: 100%; background: rgba(255, 255, 255, 0.05); height: 8px; border-radius: var(--radius-full); overflow: hidden;">
+                                <div id="prep-bar" style="width: 0%; height: 100%; background: var(--primary-gradient); transition: width 0.4s ease;"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.75rem; text-align: right;">
+                            <a href="{{ url_for('visualization') }}" class="btn" id="next-btn" style="display: none; width: 100%;">
+                                Proceed to Visualizations <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
 <script>
-    setTimeout(() => { document.getElementById('prep-bar').style.width = '30%'; document.getElementById('prep-status').innerText = 'Resizing...'; }, 500);
-    setTimeout(() => { document.getElementById('prep-bar').style.width = '60%'; document.getElementById('prep-status').innerText = 'Converting Color Space...'; }, 1000);
-    setTimeout(() => { document.getElementById('prep-bar').style.width = '100%'; document.getElementById('prep-status').innerText = 'Normalization Complete!'; document.getElementById('next-btn').style.display = 'inline-block'; }, 1500);
+    setTimeout(() => { 
+        document.getElementById('prep-bar').style.width = '35%'; 
+        document.getElementById('prep-pct').innerText = '35%';
+        document.getElementById('prep-status').innerHTML = '<i class="bi bi-crop"></i> Bilinear interpolation downsampling...'; 
+    }, 400);
+
+    setTimeout(() => { 
+        document.getElementById('prep-bar').style.width = '75%'; 
+        document.getElementById('prep-pct').innerText = '75%';
+        document.getElementById('prep-status').innerHTML = '<i class="bi bi-palette"></i> Converting BGR to RGB channel array...'; 
+    }, 900);
+
+    setTimeout(() => { 
+        document.getElementById('prep-bar').style.width = '100%'; 
+        document.getElementById('prep-pct').innerText = '100%';
+        document.getElementById('prep-status').innerHTML = '<i class="bi bi-check2-circle" style="color: var(--accent-emerald);"></i> Normalization complete! Ready for inference.'; 
+        document.getElementById('next-btn').style.display = 'inline-flex'; 
+    }, 1400);
 </script>
 {% endblock %}

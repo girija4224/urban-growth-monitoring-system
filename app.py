@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 import os
-import pandas as pd
 from werkzeug.utils import secure_filename
 from database import init_db, add_user, verify_user, get_all_users, save_prediction, get_user_predictions, get_total_users, get_total_predictions
 from preprocessing.process import full_preprocess
@@ -19,9 +18,13 @@ GRAPH_FOLDER = 'static/graphs'
 REPORT_FOLDER = 'reports'
 
 for folder in [UPLOAD_FOLDER, MODEL_FOLDER, GRAPH_FOLDER, REPORT_FOLDER]:
-    os.makedirs(folder, exist_ok=True)
+    try:
+        os.makedirs(folder, exist_ok=True)
+    except OSError:
+        pass
 
 init_db()
+
 
 @app.route('/')
 def home():
@@ -255,6 +258,7 @@ def time_series():
 @app.route('/export_excel')
 def export_excel():
     if 'user' not in session: return redirect(url_for('login'))
+    import pandas as pd
     preds = get_user_predictions(session['user'])
     
     df = pd.DataFrame(preds, columns=['Image Path', 'Model Used', 'Prediction', 'Confidence', 'Date'])

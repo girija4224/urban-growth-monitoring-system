@@ -1,12 +1,48 @@
-
 <div class="sidebar">
-    <h3 style="color: var(--text-color, white); margin-bottom: 2rem; font-size: 1.2rem; text-align: center;">User Menu</h3>
-    <a href="{{ url_for('user_dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('time_series') }}">Time-Series Expansion</a>
-    <a href="{{ url_for('preprocessing') }}">Preprocessing</a>
-    <a href="{{ url_for('visualization') }}">Visualization</a>
-    <a href="{{ url_for('prediction') }}">Prediction</a>
-    <a href="{{ url_for('result') }}">Result</a>
-    <a href="{{ url_for('history') }}">Prediction History</a>
-    <a href="{{ url_for('logout') }}" style="margin-top: auto; color: #ef4444;">Logout</a>
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">
+            <i class="bi bi-buildings"></i>
+        </div>
+        <div>
+            <div class="sidebar-brand-text">UrbanAI</div>
+            <span class="sidebar-brand-sub">Growth Monitor</span>
+        </div>
+    </div>
+
+    <div class="sidebar-label">Navigation</div>
+    <a href="{{ url_for('user_dashboard') }}" class="{% if request.endpoint == 'user_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('time_series') }}" class="{% if request.endpoint == 'time_series' %}active{% endif %}">
+        <i class="bi bi-clock-history"></i>
+        <span>Time-Series Expansion</span>
+    </a>
+    <a href="{{ url_for('preprocessing') }}" class="{% if request.endpoint == 'preprocessing' %}active{% endif %}">
+        <i class="bi bi-filter-circle-fill"></i>
+        <span>Preprocessing</span>
+    </a>
+    <a href="{{ url_for('visualization') }}" class="{% if request.endpoint == 'visualization' %}active{% endif %}">
+        <i class="bi bi-pie-chart-fill"></i>
+        <span>Visualization</span>
+    </a>
+    <a href="{{ url_for('prediction') }}" class="{% if request.endpoint == 'prediction' %}active{% endif %}">
+        <i class="bi bi-cpu-fill"></i>
+        <span>Prediction</span>
+    </a>
+    <a href="{{ url_for('result') }}" class="{% if request.endpoint == 'result' %}active{% endif %}">
+        <i class="bi bi-clipboard2-data-fill"></i>
+        <span>Inference Result</span>
+    </a>
+    <a href="{{ url_for('history') }}" class="{% if request.endpoint == 'history' %}active{% endif %}">
+        <i class="bi bi-journal-text"></i>
+        <span>Prediction History</span>
+    </a>
+
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" style="color: var(--accent-rose);">
+            <i class="bi bi-box-arrow-left" style="color: var(--accent-rose);"></i>
+            <span>Log Out</span>
+        </a>
+    </div>
 </div>

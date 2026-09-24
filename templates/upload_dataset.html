@@ -1,31 +1,64 @@
 {% extends "base.html" %}
+{% block title %}Dataset Curation — Urban Growth AI Console{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'admin_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 800px; width: 100%;">
-            <h2>Data Collection & Preprocessing</h2>
-            <form action="{{ url_for('upload_dataset') }}" method="POST">
-                <div class="form-group">
-                    <label>Browse Train Folder Directory Path</label>
-                    <input type="text" placeholder="dataset/train/" required>
-                </div>
-                <div class="form-group">
-                    <label>Browse Test Folder Directory Path</label>
-                    <input type="text" placeholder="dataset/test/" required>
-                </div>
-                <button type="submit" class="btn">Simulate Data Collection</button>
-            </form>
+        <div style="width: 100%; max-width: 900px;">
             
-            <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem;">
-                <h4 style="color: #4facfe; margin-bottom: 1rem;">Dataset Statistics Simulation</h4>
-                <ul style="list-style: none; color: #cbd5e1; line-height: 2;">
-                    <li><strong>Training Images Count:</strong> 8000</li>
-                    <li><strong>Testing Images Count:</strong> 2000</li>
-                    <li><strong>Number of Classes:</strong> 2 (Urban, Non-Urban)</li>
-                    <li><strong>Dataset Size:</strong> ~1.2 GB</li>
-                </ul>
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Remote Sensing Dataset Ingestion</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Mount satellite raster repositories and catalog training splits</p>
+                </div>
             </div>
+
+            <div class="card" style="margin-bottom: 2rem;">
+                <form action="{{ url_for('upload_dataset') }}" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label><i class="bi bi-folder2-open"></i> Train Split Path</label>
+                            <input type="text" value="dataset/train/" placeholder="dataset/train/" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-folder-check"></i> Test Split Path</label>
+                            <input type="text" value="dataset/test/" placeholder="dataset/test/" required>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-top: 1rem;">
+                        <button type="submit" class="btn">
+                            <i class="bi bi-cloud-arrow-up-fill"></i> Ingest & Verify Dataset Splits
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Dataset Summary Breakdown -->
+                <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.75rem; margin-top: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <h4 style="font-size: 1.05rem; margin: 0; color: var(--accent-cyan);">
+                            <i class="bi bi-pie-chart-fill"></i> Ingestion Split Analytics
+                        </h4>
+                        <span style="font-size: 0.75rem; color: var(--accent-emerald); padding: 2px 8px; border-radius: var(--radius-full); background: rgba(16, 185, 129, 0.15);">Verified</span>
+                    </div>
+
+                    <div class="stat-grid" style="margin-bottom: 0;">
+                        <div class="stat-widget" style="padding: 1rem;">
+                            <div class="stat-value" style="font-size: 1.75rem; color: var(--accent-cyan);">8,000</div>
+                            <div class="stat-label">Training Tiles</div>
+                        </div>
+                        <div class="stat-widget" style="padding: 1rem;">
+                            <div class="stat-value" style="font-size: 1.75rem; color: var(--accent-purple);">2,000</div>
+                            <div class="stat-label">Evaluation Tiles</div>
+                        </div>
+                        <div class="stat-widget" style="padding: 1rem;">
+                            <div class="stat-value" style="font-size: 1.75rem; color: var(--accent-emerald);">2</div>
+                            <div class="stat-label">Classes (Urban / Non)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

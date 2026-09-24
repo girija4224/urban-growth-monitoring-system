@@ -1,25 +1,66 @@
 {% extends "base.html" %}
+{% block title %}Running Deep Inference — Urban Growth AI{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'user_sidebar.html' %}
-    <div class="main-content" style="justify-content: center;">
-        <div class="card" style="text-align: center; max-width: 600px; padding: 3rem;">
-            <h2>Model Comparison & Prediction</h2>
-            <div style="margin: 2rem 0;">
-                <i class="bi bi-cpu" style="font-size: 4rem; color: var(--primary); animation: pulse 1.5s infinite;"></i>
-                <style>@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }</style>
-                <p style="margin-top: 1rem; font-size: 1.2rem;" id="pred-status">Loading Model Architecture...</p>
-                
-                <div class="progress-container" style="margin-top: 1rem;">
-                    <div class="progress-bar" id="pred-bar"></div>
+    <div class="main-content" style="justify-content: center; min-height: 100vh;">
+        <div class="card" style="text-align: center; max-width: 580px; width: 100%; padding: 3.5rem 2.5rem;">
+            
+            <!-- Animated Futuristic Radar / Core -->
+            <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed var(--accent-cyan); animation: spin 8s linear infinite;"></div>
+                <div style="position: absolute; width: 80%; height: 80%; border-radius: 50%; background: var(--primary-glow); filter: blur(10px); animation: pulse 2s ease-in-out infinite;"></div>
+                <div style="width: 54px; height: 54px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.75rem; box-shadow: 0 4px 20px var(--primary-glow); position: relative; z-index: 2;">
+                    <i class="bi bi-cpu-fill"></i>
                 </div>
             </div>
-            
+
+            <style>
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+                @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.9; } }
+            </style>
+
+            <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Executing Inference Pipeline</h2>
+            <p style="color: var(--text-muted); font-size: 0.925rem; margin-bottom: 2rem;" id="pred-status">
+                Mounting convolutional layers & weights...
+            </p>
+
+            <!-- Precision Progress Meter -->
+            <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                    <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.05em;">
+                        Forward Pass Execution
+                    </span>
+                    <span id="pred-pct" style="font-family: 'JetBrains Mono'; font-weight: 700; font-size: 0.85rem; color: var(--accent-cyan);">15%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: var(--radius-full); overflow: hidden;">
+                    <div id="pred-bar" style="width: 15%; height: 100%; background: var(--primary-gradient); transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                </div>
+            </div>
+
             <script>
-                setTimeout(() => { document.getElementById('pred-bar').style.width = '25%'; document.getElementById('pred-status').innerText = 'Extracting Features...'; }, 500);
-                setTimeout(() => { document.getElementById('pred-bar').style.width = '75%'; document.getElementById('pred-status').innerText = 'Running Inference...'; }, 1500);
-                setTimeout(() => { document.getElementById('pred-bar').style.width = '100%'; document.getElementById('pred-status').innerText = 'Generating Final Report...'; }, 2500);
-                setTimeout(() => { window.location.href = "{{ url_for('result') }}"; }, 3000);
+                setTimeout(() => { 
+                    document.getElementById('pred-bar').style.width = '45%'; 
+                    document.getElementById('pred-pct').innerText = '45%'; 
+                    document.getElementById('pred-status').innerText = 'Extracting spatial edge gradients & CAM heatmap...'; 
+                }, 600);
+
+                setTimeout(() => { 
+                    document.getElementById('pred-bar').style.width = '80%'; 
+                    document.getElementById('pred-pct').innerText = '80%'; 
+                    document.getElementById('pred-status').innerText = 'Computing classification probabilities & confidence score...'; 
+                }, 1400);
+
+                setTimeout(() => { 
+                    document.getElementById('pred-bar').style.width = '100%'; 
+                    document.getElementById('pred-pct').innerText = '100%'; 
+                    document.getElementById('pred-status').innerText = 'Synthesizing Gemini AI planning recommendations...'; 
+                }, 2200);
+
+                setTimeout(() => { 
+                    window.location.href = "{{ url_for('result') }}"; 
+                }, 2800);
             </script>
         </div>
     </div>

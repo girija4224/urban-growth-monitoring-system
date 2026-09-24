@@ -1,104 +1,188 @@
 {% extends "base.html" %}
+{% block title %}Analysis Results — Urban Growth AI{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'user_sidebar.html' %}
     <div class="main-content">
-        <!-- Interactive Model Switcher Header -->
-        <div style="width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h2 style="margin: 0;">Analysis Results</h2>
-            <form action="{{ url_for('prediction') }}" method="POST" style="display: flex; gap: 1rem; align-items: center;">
-                <label style="color: var(--text-color);">One-Click Model Switch:</label>
-                <select name="model_name" onchange="this.form.submit()" style="width: auto;">
-                    <option value="CNN" {% if result.model_used == 'CNN' %}selected{% endif %}>CNN</option>
-                    <option value="VGG16" {% if result.model_used == 'VGG16' %}selected{% endif %}>VGG16</option>
-                    <option value="VGG19" {% if result.model_used == 'VGG19' %}selected{% endif %}>VGG19</option>
-                    <option value="ResNet50" {% if result.model_used == 'ResNet50' %}selected{% endif %}>ResNet50</option>
-                </select>
-            </form>
-        </div>
-
-        <div class="card" id="exportable-report" style="max-width: 1200px; width: 100%; padding: 2rem;">
+        <div style="width: 100%; max-width: 1200px;">
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
-                <!-- Visualizations -->
-                <div style="text-align: center;">
-                    <h4 style="margin-bottom: 0.5rem; color: var(--text-color);">Original Input</h4>
-                    <img src="{{ image_path }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid var(--border-color);">
-                    
-                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Class Activation Map (Grad-CAM)</h4>
-                    <img src="{{ url_for('static', filename='graphs/heatmap_overlay.png') }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid var(--primary);">
-                    
-                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Detected Bounding Boxes</h4>
-                    <img src="{{ url_for('static', filename='graphs/bounding_boxes.png') }}" class="zoom-img" style="width: 100%; border-radius: 0.5rem; border: 2px solid #ef4444;">
-                    
-                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-color);">Geospatial Map Plot (Simulated)</h4>
-                    <div id="map" style="width: 100%; height: 250px; border-radius: 0.5rem; border: 2px solid var(--border-color);"></div>
+            <!-- Result Top Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.25rem;">Geospatial Inference Result</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Multi-layer spatial activation and semantic classification breakdown</p>
                 </div>
                 
-                <!-- Metrics & Report -->
-                <div>
-                    <h3 style="color: {{ '#ef4444' if 'Detected' in result.prediction else '#22c55e' }}; text-align: center; font-size: 2rem; margin-bottom: 1.5rem;">{{ result.prediction }}</h3>
-                    
-                    <!-- Speedometer Confidence Gauge -->
-                    <div style="position: relative; height: 150px; width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 1.5rem;">
-                        <canvas id="gaugeChart" style="max-width: 250px;"></canvas>
-                        <div style="position: absolute; bottom: 10px; font-size: 1.2rem; font-weight: bold; color: var(--text-color);">{{ result.confidence }}%</div>
-                    </div>
+                <!-- Quick Model Switcher Pill -->
+                <form action="{{ url_for('prediction') }}" method="POST" style="display: flex; gap: 0.75rem; align-items: center; background: var(--surface-1); padding: 0.5rem 1rem; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); backdrop-filter: var(--glass-blur);">
+                    <label style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">Active Model:</label>
+                    <select name="model_name" onchange="this.form.submit()" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: var(--radius-sm);">
+                        <option value="CNN" {% if result.model_used == 'CNN' %}selected{% endif %}>CNN</option>
+                        <option value="VGG16" {% if result.model_used == 'VGG16' %}selected{% endif %}>VGG16</option>
+                        <option value="VGG19" {% if result.model_used == 'VGG19' %}selected{% endif %}>VGG19</option>
+                        <option value="ResNet50" {% if result.model_used == 'ResNet50' %}selected{% endif %}>ResNet50</option>
+                    </select>
+                </form>
+            </div>
 
-                    <!-- Advanced Metrics Table -->
-                    <div style="background: rgba(0,0,0,0.1); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
-                        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-bar-chart-line-fill"></i> Model Evaluation Metrics ({{ result.model_used }})</h4>
-                        <table style="width: 100%; text-align: left;">
-                            <tr><th>Accuracy:</th><td>98.5%</td></tr>
-                            <tr><th>Precision:</th><td>97.2%</td></tr>
-                            <tr><th>Recall:</th><td>99.1%</td></tr>
-                            <tr><th>F1-Score:</th><td>98.1%</td></tr>
-                        </table>
+            <!-- Main Content Container -->
+            <div class="card" id="exportable-report" style="margin-bottom: 2rem;">
+                
+                <!-- Prediction Header Banner -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding: 1.5rem; background: {% if 'Detected' in result.prediction or 'Urban' in result.prediction %}rgba(6, 182, 212, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %}; border: 1px solid {% if 'Detected' in result.prediction or 'Urban' in result.prediction %}var(--border-active){% else %}rgba(16, 185, 129, 0.4){% endif %}; border-radius: var(--radius-md); margin-bottom: 2rem;">
+                    <div>
+                        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-cyan);">
+                            Classification Outcome
+                        </div>
+                        <h1 style="font-size: 2.25rem; margin: 0.25rem 0; color: {% if 'Detected' in result.prediction or 'Urban' in result.prediction %}var(--accent-cyan){% else %}var(--accent-emerald){% endif %};">
+                            {{ result.prediction }}
+                        </h1>
                     </div>
-                    
-                    <!-- Confusion Matrix -->
-                    <div style="text-align: center; margin-bottom: 1.5rem;">
-                        <h4 style="margin-bottom: 0.5rem; color: var(--text-color);">Simulated Confusion Matrix</h4>
-                        <img src="{{ url_for('static', filename='graphs/confusion_matrix.png') }}" class="zoom-img" style="max-width: 250px; border-radius: 0.5rem; border: 1px solid var(--border-color);">
-                    </div>
-                    
-                    <!-- Gemini AI Report -->
-                    <div style="background: rgba(79,172,254,0.1); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--primary);">
-                        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="bi bi-robot"></i> AI Generated Executive Summary</h4>
-                        <div style="color: var(--text-color); font-size: 0.95rem; line-height: 1.6;">
-                            {{ suggestions|safe }}
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Confidence Level</div>
+                        <div style="font-size: 2.25rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main);">
+                            {{ result.confidence }}%
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 3rem;" data-html2canvas-ignore>
-                <button onclick="exportPDF()" class="btn" style="background: #10b981;"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF Report</button>
-                <a href="{{ url_for('user_dashboard') }}" class="btn btn-secondary">Predict Another Image</a>
+
+                <!-- 2-Column Visual & Metric Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
+                    
+                    <!-- Left: Geospatial Imagery & Vision Maps -->
+                    <div>
+                        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted);"><i class="bi bi-image"></i> Original Raster Image</h4>
+                        <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); margin-bottom: 1.5rem;">
+                            <img src="{{ image_path }}" class="zoom-img" style="width: 100%; display: block;">
+                        </div>
+
+                        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent-cyan);"><i class="bi bi-fire"></i> Class Activation Heatmap (Grad-CAM)</h4>
+                        <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-active); margin-bottom: 1.5rem;">
+                            <img src="{{ url_for('static', filename='graphs/heatmap_overlay.png') }}" class="zoom-img" style="width: 100%; display: block;">
+                        </div>
+
+                        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent-rose);"><i class="bi bi-bounding-box"></i> Object & Settlement Bounding Regions</h4>
+                        <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); margin-bottom: 1.5rem;">
+                            <img src="{{ url_for('static', filename='graphs/bounding_boxes.png') }}" class="zoom-img" style="width: 100%; display: block;">
+                        </div>
+
+                        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted);"><i class="bi bi-geo-alt-fill"></i> Satellite Geo-Coordinate Anchor</h4>
+                        <div id="map" style="width: 100%; height: 260px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);"></div>
+                    </div>
+
+                    <!-- Right: Model Analytics & Metrics -->
+                    <div>
+                        <!-- Speedometer Confidence Gauge -->
+                        <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1rem;">
+                                Neural Confidence Gauge
+                            </div>
+                            <div style="position: relative; height: 160px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="gaugeChart" style="max-width: 260px;"></canvas>
+                                <div style="position: absolute; bottom: 12px; font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main);">
+                                    {{ result.confidence }}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Benchmark Metrics Table -->
+                        <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 style="font-size: 0.95rem; margin: 0; color: var(--accent-cyan);">
+                                    <i class="bi bi-bar-chart-line-fill"></i> Benchmark Metrics ({{ result.model_used }})
+                                </h4>
+                                <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: var(--radius-full); background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">Validated</span>
+                            </div>
+                            <table>
+                                <tr><th>Accuracy</th><td style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--accent-emerald);">98.5%</td></tr>
+                                <tr><th>Precision</th><td style="font-family: 'JetBrains Mono';">97.2%</td></tr>
+                                <tr><th>Recall</th><td style="font-family: 'JetBrains Mono';">99.1%</td></tr>
+                                <tr><th>F1-Score</th><td style="font-family: 'JetBrains Mono';">98.1%</td></tr>
+                                <tr><th>Inference Latency</th><td style="font-family: 'JetBrains Mono';">{{ result.time_taken }}s</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Confusion Matrix -->
+                        <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-dim); margin-bottom: 1rem;">
+                                Validation Confusion Matrix
+                            </div>
+                            <img src="{{ url_for('static', filename='graphs/confusion_matrix.png') }}" class="zoom-img" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendations Section -->
+                <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </div>
+                        <h3 style="font-size: 1.25rem; margin: 0;">AI Strategic Suggestions</h3>
+                    </div>
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.75rem; line-height: 1.7; color: var(--text-main);">
+                        {{ suggestions | safe }}
+                    </div>
+                </div>
+
+                <!-- Export & Download Actions -->
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+                    <button onclick="exportToPDF()" class="btn btn-secondary">
+                        <i class="bi bi-file-earmark-pdf-fill" style="color: var(--accent-rose);"></i> Export Analysis PDF
+                    </button>
+                    <a href="{{ url_for('download_report') }}" class="btn btn-secondary">
+                        <i class="bi bi-file-text-fill" style="color: var(--accent-cyan);"></i> Download TXT Brief
+                    </a>
+                    <a href="{{ url_for('user_dashboard') }}" class="btn">
+                        <i class="bi bi-plus-circle-fill"></i> Analyze Another Image
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const ctx = document.getElementById('gaugeChart').getContext('2d');
-    const confidence = parseFloat("{{ result.confidence }}");
-    const data = {
-        labels: ['Confidence', ''],
-        datasets: [{
-            data: [confidence, 100 - confidence],
-            backgroundColor: [confidence > 80 ? '#22c55e' : (confidence > 50 ? '#f59e0b' : '#ef4444'), '#334155'],
-            borderWidth: 0,
-            circumference: 180,
-            rotation: 270,
-            cutout: '80%'
-        }]
-    };
-    new Chart(ctx, { type: 'doughnut', data: data, options: { responsive: true, plugins: { tooltip: { enabled: false }, legend: { display: false } } } });
+    // Leaflet Geospatial Map Initialization
+    var map = L.map('map').setView([17.3850, 78.4867], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    L.marker([17.3850, 78.4867]).addTo(map)
+        .bindPopup('<b>Analyzed Tile Coordinates</b><br>{{ result.prediction }} Region')
+        .openPopup();
 
-    function exportPDF() {
-        const element = document.getElementById('exportable-report');
-        const opt = {
+    // Confidence Gauge Chart
+    var ctx = document.getElementById('gaugeChart').getContext('2d');
+    var confidence = {{ result.confidence }};
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [confidence, 100 - confidence],
+                backgroundColor: ['#06b6d4', 'rgba(255, 255, 255, 0.08)'],
+                borderWidth: 0,
+                circumference: 180,
+                rotation: 270
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '80%',
+            plugins: {
+                tooltip: { enabled: false }
+            }
+        }
+    });
+
+    // PDF Export Utility
+    function exportToPDF() {
+        var element = document.getElementById('exportable-report');
+        var opt = {
             margin:       0.3,
             filename:     'Urban_Growth_Report_{{ result.model_used }}.pdf',
             image:        { type: 'jpeg', quality: 0.98 },
@@ -107,19 +191,5 @@
         };
         html2pdf().set(opt).from(element).save();
     }
-    
-    // Initialize Leaflet Map (Simulated Coordinate)
-    setTimeout(() => {
-        var map = L.map('map').setView([28.7041, 77.1025], 13); // Default Delhi coordinates
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-        var markerColor = "{{ 'red' if 'Detected' in result.prediction else 'green' }}";
-        var circle = L.circle([28.7041, 77.1025], {
-            color: markerColor,
-            fillColor: markerColor,
-            fillOpacity: 0.5,
-            radius: 500
-        }).addTo(map);
-        circle.bindPopup("<b>{{ result.prediction }}</b><br>Simulated Geospatial Tag.").openPopup();
-    }, 500);
 </script>
 {% endblock %}

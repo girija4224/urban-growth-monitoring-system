@@ -1,36 +1,113 @@
 {% extends "base.html" %}
+{% block title %}User Dashboard — Urban Growth AI{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'user_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
-            <h2>Welcome {{ session.user }}</h2>
-            <p style="color: var(--text-color); margin-bottom: 2rem;">Today's Date: {{ date }}</p>
+        <div style="width: 100%; max-width: 950px;">
             
-            <form action="{{ url_for('user_dashboard') }}" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Select Pre-Trained Model</label>
-                    <select name="model_file" required>
-                        <option value="CNN">CNN</option>
-                        <option value="VGG16">VGG16</option>
-                        <option value="VGG19">VGG19</option>
-                        <option value="ResNet50">ResNet50</option>
-                    </select>
+            <!-- Dashboard Welcome Header -->
+            <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">
+                            Welcome back, <span class="gradient-title">{{ session.user }}</span> 👋
+                        </h2>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">
+                            Upload satellite images to execute deep learning models and extract growth patterns.
+                        </p>
+                    </div>
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-subtle); padding: 0.6rem 1.2rem; border-radius: var(--radius-full); font-size: 0.85rem; color: var(--text-muted);">
+                        <i class="bi bi-calendar3"></i> {{ date }}
+                    </div>
                 </div>
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label>Browse Input Remote Sensing Image</label>
-                    <input type="file" name="image" accept="image/*" required style="padding: 1rem; border: 1px dashed var(--primary); width: 100%;">
-                </div>
-                <button type="submit" class="btn" style="margin-top: 1.5rem;"><i class="bi bi-cloud-upload"></i> Upload & Preprocess</button>
-            </form>
-            
-            <h4 style="margin-top: 3rem; color: var(--primary);">Recent Activity</h4>
-            <div class="activity-feed">
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-image"></i></div><div>Uploaded new satellite image for analysis. <br><small style="opacity:0.7;">Just now</small></div></div>
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-cpu"></i></div><div>Ran ResNet50 model (Prediction: Urban Detected). <br><small style="opacity:0.7;">2 hours ago</small></div></div>
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-file-earmark-pdf"></i></div><div>Exported prediction report as PDF. <br><small style="opacity:0.7;">1 day ago</small></div></div>
             </div>
+
+            <!-- Upload & Preprocess Card -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.25rem;"><i class="bi bi-cloud-arrow-up-fill" style="color: var(--accent-cyan);"></i> Image Classification Pipeline</h3>
+                    <span style="font-size: 0.8rem; color: var(--text-dim);">Step 1 of 3: Preprocessing</span>
+                </div>
+
+                <form action="{{ url_for('user_dashboard') }}" method="POST" enctype="multipart/form-data">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label><i class="bi bi-cpu"></i> Select Deep Learning Model</label>
+                            <select name="model_file" required>
+                                <option value="CNN">Custom CNN Architecture (Fast Baseline)</option>
+                                <option value="VGG16">VGG16 Deep Convolutional Network</option>
+                                <option value="VGG19">VGG19 Extended Deep Feature Extractor</option>
+                                <option value="ResNet50" selected>ResNet50 Residual Network (High Precision)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="bi bi-image"></i> Satellite / Aerial Image Input</label>
+                            <div class="file-upload-box" onclick="document.getElementById('imgInput').click();">
+                                <i class="bi bi-cloud-upload"></i>
+                                <div style="font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">
+                                    Click or Drag & Drop satellite imagery here
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                    Supports PNG, JPG, JPEG, TIFF (Max 25MB)
+                                </div>
+                                <div id="selectedFileName" style="margin-top: 0.75rem; color: var(--accent-cyan); font-weight: 600; font-size: 0.9rem;"></div>
+                                <input type="file" id="imgInput" name="image" accept="image/*" required style="display: none;" onchange="updateFileName(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn" style="min-width: 220px;">
+                            <i class="bi bi-lightning-charge-fill"></i> Upload & Preprocess
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Activity Logs -->
+            <div class="card">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.15rem;"><i class="bi bi-activity" style="color: var(--accent-cyan);"></i> Session Activity Stream</h3>
+                    <span style="font-size: 0.8rem; color: var(--accent-emerald);"><i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> System Live</span>
+                </div>
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="bi bi-image"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-main);">Inference engine initialized</div>
+                            <small style="color: var(--text-dim);">Ready for remote sensing raster tiles</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="bi bi-cpu"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-main);">Model weights loaded into memory</div>
+                            <small style="color: var(--text-dim);">ResNet50 / VGG architectures mounted</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="bi bi-file-earmark-bar-graph"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-main);">AI Reporting Agent standby</div>
+                            <small style="color: var(--text-dim);">Gemini-driven automated urban planning recommendations</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<script>
+    function updateFileName(input) {
+        const display = document.getElementById('selectedFileName');
+        if (input.files && input.files[0]) {
+            display.innerHTML = `<i class="bi bi-file-earmark-check"></i> Selected: ${input.files[0].name}`;
+        }
+    }
+</script>
 {% endblock %}

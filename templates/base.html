@@ -1,170 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Urban Growth Monitoring{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <title>{% block title %}Urban Growth AI | Remote Sensing Intelligence{% endblock %}</title>
+    
+    <!-- Modern Typography & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Geospatial Map & Chart Libraries -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        :root {
-            --bg-color: #09090b;
-            --card-bg: #18181b;
-            --text-color: #e4e4e7;
-            --primary: #6366f1;
-            --border-color: #27272a;
+        .home-hero {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle at 50% 30%, rgba(6, 182, 212, 0.12) 0%, rgba(11, 15, 25, 0.95) 75%),
+                        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80') center/cover no-repeat;
+            padding: 2rem;
+            text-align: center;
         }
-        [data-theme="light"] {
-            --bg-color: #fafafa;
-            --card-bg: #ffffff;
-            --text-color: #09090b;
-            --primary: #4f46e5;
-            --border-color: #e4e4e7;
+
+        .home-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-full);
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid var(--border-active);
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.15);
+            backdrop-filter: blur(10px);
         }
-        body { background-color: var(--bg-color); color: var(--text-color); transition: all 0.3s ease; }
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .sidebar { background: var(--card-bg); border-right: 1px solid var(--border-color); }
-        .sidebar a { color: var(--text-color); }
-        .sidebar a:hover { background: rgba(79,172,254,0.2); }
-        .layout { display: flex; min-height: 100vh; }
-        .sidebar { width: 250px; padding: 2rem 1rem; }
-        .sidebar a { display: block; padding: 0.75rem 1rem; text-decoration: none; border-radius: 0.5rem; margin-bottom: 0.5rem; transition: background 0.2s; }
-        .main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; align-items: center; position: relative; }
-        .full-bg { background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') center/cover; }
-        .home-overlay { background: rgba(15,23,42,0.8); width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .theme-toggle { position: fixed; bottom: 20px; left: 20px; background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 20px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        table th, table td { color: var(--text-color); border-bottom: 1px solid var(--border-color) !important; padding: 1rem; }
-        input, select { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem; width: 100%; box-sizing: border-box; }
-        .zoom-img { transition: transform 0.3s ease; cursor: zoom-in; }
-        .zoom-img.zoomed { transform: scale(1.5); cursor: zoom-out; z-index: 50; position: relative; }
-        
-        /* Chatbot */
-        .chatbot-container { position: fixed; bottom: 20px; right: 20px; width: 350px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 1000; overflow: hidden; }
-        .chatbot-header { background: var(--primary); color: white; padding: 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .chatbot-messages { height: 300px; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .chatbot-input { display: flex; border-top: 1px solid var(--border-color); }
-        .chatbot-input input { border: none; padding: 1rem; flex: 1; border-radius: 0; outline: none; }
-        .chatbot-input button { background: var(--primary); color: white; border: none; padding: 1rem; cursor: pointer; }
-        .msg { padding: 0.75rem 1rem; border-radius: 1rem; max-width: 80%; font-size: 0.9rem; }
-        .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 0; }
-        .msg.bot { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 0; }
-        .chat-toggle { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; z-index: 999; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
-        
-        /* Progress Bar */
-        .progress-container { width: 100%; background: var(--bg-color); border-radius: 1rem; overflow: hidden; height: 1.5rem; border: 1px solid var(--border-color); margin-top: 1.5rem; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); width: 0%; transition: width 0.5s ease; position: relative; }
-        
-        /* Navbar Notifications */
-        .navbar { position: absolute; top: 1rem; right: 2rem; display: flex; align-items: center; gap: 1rem; z-index: 100; }
-        .notif-bell { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; position: relative; }
-        .notif-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.7rem; padding: 0.2rem 0.4rem; border-radius: 50%; }
-        .notif-dropdown { display: none; position: absolute; top: 100%; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); width: 300px; border-radius: 0.5rem; margin-top: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .notif-item { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-        
-        /* Activity Feed */
-        .activity-feed { background: var(--bg-color); border-radius: 0.5rem; border: 1px solid var(--border-color); padding: 1rem; max-height: 250px; overflow-y: auto; }
-        .activity-item { padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem; }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { background: var(--primary); color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 100%;
+            margin-top: 3rem;
+            text-align: left;
+        }
+
+        .feature-item {
+            background: var(--surface-1);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--border-active);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    <button class="theme-toggle" onclick="toggleTheme()"><i class="bi bi-moon-stars"></i> Toggle Theme</button>
     
-    {% if session.get('user') or session.get('admin') %}
-    <div class="navbar">
-        <div class="notif-bell" onclick="document.getElementById('notif-drop').style.display = document.getElementById('notif-drop').style.display === 'block' ? 'none' : 'block';">
-            <i class="bi bi-bell-fill"></i> Notifications
-            <span class="notif-badge">3</span>
-            <div class="notif-dropdown" id="notif-drop">
-                <div class="notif-item"><i class="bi bi-check-circle" style="color: #10b981;"></i> Model ResNet50 training completed.</div>
-                <div class="notif-item"><i class="bi bi-person-plus" style="color: var(--primary);"></i> New user registered: Admin123</div>
-                <div class="notif-item"><i class="bi bi-image" style="color: #f59e0b;"></i> New prediction uploaded by {{ session.get('user', 'Admin') }}</div>
+    <!-- Top Floating Quick Controls -->
+    <div class="top-navbar">
+        <button class="nav-pill-btn" onclick="toggleTheme()" title="Switch Light/Dark Mode">
+            <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+            <span id="theme-text">Dark Mode</span>
+        </button>
+
+        {% if session.get('user') or session.get('admin') %}
+        <div style="position: relative;">
+            <button class="nav-pill-btn" onclick="toggleNotifs()">
+                <i class="bi bi-bell-fill" style="color: var(--accent-cyan);"></i>
+                <span>Alerts</span>
+                <span style="background: var(--accent-rose); color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 6px; font-weight: 700;">2</span>
+            </button>
+            <div class="notif-dropdown" id="notif-dropdown-menu">
+                <div class="notif-item">
+                    <i class="bi bi-check2-circle" style="color: var(--accent-emerald); font-size: 1.25rem;"></i>
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-main);">Inference Engine Ready</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Satellite analysis pipeline online.</div>
+                    </div>
+                </div>
+                <div class="notif-item">
+                    <i class="bi bi-shield-check" style="color: var(--accent-cyan); font-size: 1.25rem;"></i>
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-main);">Session Active</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Logged in as {{ session.get('user', 'Admin') }}</div>
+                    </div>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 
-    {% if session.get('user') %}
-    <!-- Floating Chatbot -->
-    <button class="chat-toggle" onclick="document.getElementById('chatbot').style.display='flex'; this.style.display='none';"><i class="bi bi-chat-dots-fill"></i></button>
-    <div class="chatbot-container" id="chatbot">
-        <div class="chatbot-header" onclick="document.getElementById('chatbot').style.display='none'; document.querySelector('.chat-toggle').style.display='flex';">
-            <span>Urban Planning Assistant</span>
-            <i class="bi bi-x-lg"></i>
-        </div>
-        <div class="chatbot-messages" id="chat-msgs">
-            <div class="msg bot">Hello! I am your AI assistant. Ask me anything about urban planning or your recent predictions.</div>
-        </div>
-        <div class="chatbot-input">
-            <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
-        </div>
-    </div>
-    {% endif %}
-    
+    <!-- Flashed Alert Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div style="position: absolute; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 100;">
+            <div style="position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 500px;">
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+                <div class="alert alert-{{ category if category != 'error' else 'danger' }}">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span>{{ message }}</span>
+                </div>
             {% endfor %}
             </div>
         {% endif %}
     {% endwith %}
 
-    {% block layout %}
-    {% endblock %}
+    <!-- Page Layout Slot -->
+    {% block layout %}{% endblock %}
+
+    <!-- Floating AI Assistant Chatbot -->
+    {% if session.get('user') %}
+    <button class="chat-toggle" id="chatToggleBtn" onclick="toggleChat(true)" title="Ask AI Assistant">
+        <i class="bi bi-robot"></i>
+    </button>
+    <div class="chatbot-container" id="chatbotModal">
+        <div class="chatbot-header">
+            <h4><i class="bi bi-cpu-fill" style="color: var(--accent-cyan);"></i> Urban AI Assistant</h4>
+            <button onclick="toggleChat(false)" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem;"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="chatbot-messages" id="chat-msgs">
+            <div class="msg bot">
+                👋 Hello! I am your Geospatial AI assistant. You can ask me questions about urban expansion detection, model metrics, or sustainable city planning!
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chat-input" placeholder="Ask about urban growth..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+    {% endif %}
 
     <script>
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            localStorage.setItem('urban_theme', newTheme);
+            updateThemeUI(newTheme);
         }
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+
+        function updateThemeUI(theme) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            if (!icon || !text) return;
+            if (theme === 'light') {
+                icon.className = 'bi bi-sun-fill';
+                text.innerText = 'Light Mode';
+            } else {
+                icon.className = 'bi bi-moon-stars-fill';
+                text.innerText = 'Dark Mode';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('urban_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
-        
+        updateThemeUI(savedTheme);
+
+        function toggleNotifs() {
+            const menu = document.getElementById('notif-dropdown-menu');
+            if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleChat(show) {
+            const modal = document.getElementById('chatbotModal');
+            const btn = document.getElementById('chatToggleBtn');
+            if (modal && btn) {
+                modal.style.display = show ? 'flex' : 'none';
+                btn.style.display = show ? 'none' : 'flex';
+            }
+        }
+
         document.querySelectorAll('.zoom-img').forEach(img => {
-            img.addEventListener('click', function() { this.classList.toggle('zoomed'); });
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', function() {
+                this.classList.toggle('zoomed');
+                this.style.cursor = this.classList.contains('zoomed') ? 'zoom-out' : 'zoom-in';
+            });
         });
 
         async function sendMessage() {
             const input = document.getElementById('chat-input');
-            const msgText = input.value.trim();
-            if (!msgText) return;
-            
-            const chatMsgs = document.getElementById('chat-msgs');
-            chatMsgs.innerHTML += `<div class="msg user">${msgText}</div>`;
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBox = document.getElementById('chat-msgs');
+            chatBox.innerHTML += `<div class="msg user">${escapeHtml(text)}</div>`;
             input.value = '';
-            chatMsgs.scrollTop = chatMsgs.scrollHeight;
-            
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'msg bot';
-            typingDiv.innerText = 'Thinking...';
-            chatMsgs.appendChild(typingDiv);
-            chatMsgs.scrollTop = chatMsgs.scrollHeight;
-            
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const typing = document.createElement('div');
+            typing.className = 'msg bot';
+            typing.innerHTML = '<i class="bi bi-hourglass-split"></i> Analyzing...';
+            chatBox.appendChild(typing);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
             try {
                 const res = await fetch('/chat', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message: msgText})
+                    body: JSON.stringify({message: text})
                 });
                 const data = await res.json();
-                chatMsgs.removeChild(typingDiv);
-                chatMsgs.innerHTML += `<div class="msg bot">${data.response}</div>`;
+                chatBox.removeChild(typing);
+                chatBox.innerHTML += `<div class="msg bot">${data.response}</div>`;
             } catch(e) {
-                chatMsgs.removeChild(typingDiv);
-                chatMsgs.innerHTML += `<div class="msg bot" style="color:red;">Error connecting to AI.</div>`;
+                chatBox.removeChild(typing);
+                chatBox.innerHTML += `<div class="msg bot" style="color: var(--accent-rose);">AI service temporarily unavailable.</div>`;
             }
-            chatMsgs.scrollTop = chatMsgs.scrollHeight;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function escapeHtml(string) {
+            return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;',
+                    '/': '&#x2F;',
+                    '`': '&#x60;',
+                    '=': '&#x3D;'
+                })[s];
+            });
         }
     </script>
 </body>

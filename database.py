@@ -1,8 +1,15 @@
 import sqlite3
 import os
+import tempfile
 from datetime import datetime
 
-DB_NAME = "signup.db"
+# In serverless environments like Vercel, the project root is read-only.
+# We store the sqlite DB in the OS temp directory (/tmp).
+if os.environ.get('VERCEL') or os.environ.get('AWS_LAMBDA_FUNCTION_NAME'):
+    DB_NAME = os.path.join(tempfile.gettempdir(), "signup.db")
+else:
+    DB_NAME = "signup.db"
+
 
 def init_db():
     conn = sqlite3.connect(DB_NAME)

@@ -1,47 +1,85 @@
 {% extends "base.html" %}
+{% block title %}Prediction History — Urban Growth AI{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'user_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 1000px; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2>Prediction History</h2>
-                <a href="{{ url_for('export_excel') }}" class="btn" style="background: #10b981;">Export to Excel</a>
-            </div>
+        <div style="width: 100%; max-width: 1050px;">
             
-            <form action="{{ url_for('history') }}" method="GET" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-                <input type="text" name="search" value="{{ search }}" placeholder="Search by Date, Model, or Prediction..." style="flex: 1; padding: 0.75rem; border-radius: 0.5rem;">
-                <button type="submit" class="btn">Search</button>
-            </form>
-            
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 1rem; color: var(--primary);">Date</th>
-                            <th style="padding: 1rem; color: var(--primary);">Model Used</th>
-                            <th style="padding: 1rem; color: var(--primary);">Prediction</th>
-                            <th style="padding: 1rem; color: var(--primary);">Confidence</th>
-                            <th style="padding: 1rem; color: var(--primary);">Image Path</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for pred in predictions %}
-                        <tr>
-                            <td style="padding: 1rem;">{{ pred[4] }}</td>
-                            <td style="padding: 1rem;">{{ pred[1] }}</td>
-                            <td style="padding: 1rem;">
-                                <span style="color: {{ '#ef4444' if 'Detected' in pred[2] else '#22c55e' }}; font-weight: bold;">{{ pred[2] }}</span>
-                            </td>
-                            <td style="padding: 1rem;">{{ pred[3] }}%</td>
-                            <td style="padding: 1rem; font-size: 0.8rem; opacity: 0.7;">{{ pred[0] }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="5" style="text-align: center; padding: 2rem;">No predictions found.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">Prediction History Log</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Audit and export historical raster tile classification inferences</p>
+                </div>
+                <a href="{{ url_for('export_excel') }}" class="btn btn-secondary">
+                    <i class="bi bi-file-earmark-excel-fill" style="color: var(--accent-emerald);"></i> Export to Excel (.xlsx)
+                </a>
             </div>
+
+            <div class="card">
+                <!-- Search Bar -->
+                <form action="{{ url_for('history') }}" method="GET" style="display: flex; gap: 0.75rem; margin-bottom: 1.75rem;">
+                    <div style="position: relative; flex: 1;">
+                        <input type="text" name="search" value="{{ search }}" placeholder="Filter by date, model (CNN, ResNet50), or prediction status..." style="padding-left: 2.75rem;">
+                        <i class="bi bi-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim);"></i>
+                    </div>
+                    <button type="submit" class="btn" style="min-width: 120px;">
+                        Filter
+                    </button>
+                    {% if search %}
+                    <a href="{{ url_for('history') }}" class="btn btn-secondary" style="min-width: 100px;">Reset</a>
+                    {% endif %}
+                </form>
+
+                <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Model Architecture</th>
+                                <th>Prediction Outcome</th>
+                                <th>Confidence</th>
+                                <th>Source Path</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in predictions %}
+                            <tr>
+                                <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted);">
+                                    <i class="bi bi-calendar-event"></i> {{ pred[4] }}
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600; padding: 2px 8px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border-subtle);">
+                                        {{ pred[1] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; color: {% if 'Detected' in pred[2] or 'Urban' in pred[2] %}var(--accent-cyan){% else %}var(--accent-emerald){% endif %};">
+                                        <i class="bi {% if 'Detected' in pred[2] or 'Urban' in pred[2] %}bi-buildings{% else %}bi-tree{% endif %}"></i>
+                                        {{ pred[2] }}
+                                    </span>
+                                </td>
+                                <td style="font-family: 'JetBrains Mono', monospace; font-weight: 700;">
+                                    {{ pred[3] }}%
+                                </td>
+                                <td style="font-size: 0.8rem; color: var(--text-dim); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ pred[0] }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                    <i class="bi bi-inbox" style="font-size: 2rem; display: block; margin-bottom: 0.5rem; color: var(--text-dim);"></i>
+                                    No inference records found matching your query.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

@@ -1,7 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import os
 import cv2
@@ -112,13 +111,19 @@ def generate_inference_visualizations(image_path, save_dir="static/graphs"):
     plt.close()
     
     # 5. Simulated Confusion Matrix
-    plt.figure(figsize=(6, 4))
-    # Simulated values for high accuracy model
+    fig, ax = plt.subplots(figsize=(6, 4))
     cm = np.array([[1150, 50], [30, 770]])
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Non-Urban', 'Urban'], yticklabels=['Non-Urban', 'Urban'])
-    plt.xlabel('Predicted Label')
-    plt.ylabel('True Label')
-    plt.title('Simulated Confusion Matrix')
+    im = ax.imshow(cm, cmap='Blues', aspect='auto')
+    for (i, j), val in np.ndenumerate(cm):
+        ax.text(j, i, str(val), ha='center', va='center', color='white' if val > 500 else 'black')
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 1])
+    ax.set_xticklabels(['Non-Urban', 'Urban'])
+    ax.set_yticklabels(['Non-Urban', 'Urban'])
+    ax.set_xlabel('Predicted Label')
+    ax.set_ylabel('True Label')
+    ax.set_title('Simulated Confusion Matrix')
+    fig.colorbar(im, ax=ax)
     plt.savefig(os.path.join(save_dir, 'confusion_matrix.png'))
     plt.close()
     

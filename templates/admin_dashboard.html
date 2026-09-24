@@ -1,35 +1,94 @@
 {% extends "base.html" %}
+{% block title %}System Overview — Urban Growth AI Console{% endblock %}
+
 {% block layout %}
 <div class="layout">
     {% include 'admin_sidebar.html' %}
     <div class="main-content">
-        <div class="card" style="max-width: 800px; width: 100%; padding: 2rem;">
-            <h2>Admin Dashboard</h2>
-            <p style="color: var(--text-color); margin-bottom: 2rem;">Manage datasets, train models, and view users.</p>
+        <div style="width: 100%; max-width: 950px;">
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.5rem; text-align: center; border: 1px solid var(--primary);">
-                    <h1 style="color: var(--primary); font-size: 3rem; margin: 0;">{{ total_users }}</h1>
-                    <p>Total Registered Users</p>
+            <div class="card-header-bar" style="margin-bottom: 2rem;">
+                <div>
+                    <h2 style="font-size: 1.85rem; margin-bottom: 0.35rem;">System Admin Console</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Model orchestrator, dataset curation, and global analytics</p>
                 </div>
-                <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 0.5rem; text-align: center; border: 1px solid #10b981;">
-                    <h1 style="color: #10b981; font-size: 3rem; margin: 0;">{{ total_models }}</h1>
-                    <p>Total Models Run / Predictions</p>
+                <span style="padding: 0.4rem 1rem; border-radius: var(--radius-full); background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.85rem; font-weight: 600;">
+                    <i class="bi bi-shield-check"></i> System Secure
+                </span>
+            </div>
+
+            <!-- Global Metric Counters -->
+            <div class="stat-grid">
+                <div class="stat-widget">
+                    <div class="stat-value" style="color: var(--accent-cyan);">{{ total_users }}</div>
+                    <div class="stat-label">Registered Researchers</div>
+                </div>
+                <div class="stat-widget">
+                    <div class="stat-value" style="color: var(--accent-emerald);">{{ total_models }}</div>
+                    <div class="stat-label">Predictions Executed</div>
+                </div>
+                <div class="stat-widget">
+                    <div class="stat-value" style="color: var(--accent-purple);">4</div>
+                    <div class="stat-label">Active Neural Models</div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <a href="{{ url_for('upload_dataset') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center;">Upload Dataset & Collect Data</a>
-                <a href="{{ url_for('train_model') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center;">Create & Train DL Models</a>
-                <a href="{{ url_for('user_details') }}" class="btn btn-secondary" style="padding: 2rem; text-align: center; grid-column: span 2;">View Registered Users</a>
+            <!-- Quick Action Hub -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.15rem;"><i class="bi bi-grid-fill" style="color: var(--accent-cyan);"></i> Administrative Tools</h3>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <a href="{{ url_for('upload_dataset') }}" class="btn btn-secondary" style="padding: 1.5rem; justify-content: flex-start;">
+                        <i class="bi bi-cloud-arrow-up-fill" style="font-size: 1.5rem; color: var(--accent-cyan);"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700; color: var(--text-main);">Upload Dataset</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Manage raster satellite tiles</div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('train_model') }}" class="btn btn-secondary" style="padding: 1.5rem; justify-content: flex-start;">
+                        <i class="bi bi-cpu-fill" style="font-size: 1.5rem; color: var(--accent-purple);"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700; color: var(--text-main);">Train Architectures</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Fine-tune CNN & ResNet50</div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('user_details') }}" class="btn btn-secondary" style="padding: 1.5rem; justify-content: flex-start; grid-column: span 2;">
+                        <i class="bi bi-people-fill" style="font-size: 1.5rem; color: var(--accent-emerald);"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700; color: var(--text-main);">User Account Directory</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">Inspect registered researchers and access controls</div>
+                        </div>
+                    </a>
+                </div>
             </div>
-            
-            <h4 style="margin-top: 3rem; color: var(--primary);">System Activity Feed</h4>
-            <div class="activity-feed">
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-person-plus"></i></div><div>New user registered successfully. <br><small style="opacity:0.7;">10 mins ago</small></div></div>
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-cpu"></i></div><div>Model ResNet50 training completed. <br><small style="opacity:0.7;">1 hour ago</small></div></div>
-                <div class="activity-item"><div class="activity-icon"><i class="bi bi-download"></i></div><div>Model weights (.h5) exported. <br><small style="opacity:0.7;">1 hour ago</small></div></div>
+
+            <!-- System Logs -->
+            <div class="card">
+                <div class="card-header-bar">
+                    <h3 style="font-size: 1.15rem;"><i class="bi bi-clock-history" style="color: var(--accent-cyan);"></i> Cluster Activity Audit</h3>
+                </div>
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon"><i class="bi bi-person-check-fill"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-main);">User verified and authenticated</div>
+                            <small style="color: var(--text-dim);">Database connection healthy on SQLite</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon" style="color: var(--accent-purple);"><i class="bi bi-cpu"></i></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-main);">ResNet50 inference checkpoint synced</div>
+                            <small style="color: var(--text-dim);">Heuristic edge density & CAM active</small>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
